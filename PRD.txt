@@ -1,0 +1,277 @@
+Productivity OS: Product Requirements Document
+Version 1.0 · Rust + Tauri 2 desktop app · Single user · Local-first
+1. Summary
+Productivity OS is a personal desktop app that launches with the PC and answers two questions: What do I need to do today? and Am I actually progressing toward the life I want?
+The core loop is Begin Day → execute quests → close day → reports. Goals set direction. Habits, spiritual practices and workouts build discipline. Projects and tasks hold the work. Today turns all of it into one list. The look is a dark, game-inspired "system" (levels, quests, ranks) on top of honest, explainable numbers.
+All logic, storage, backups, auto-start and notifications are written in Rust. The screens are a web UI rendered by Tauri's system WebView, because Tauri requires one. The output is a small Windows .exe / installer.
+2. Goals and non-goals
+Goals
+• A morning screen that pulls attention and shows today, this week, this month, streaks and level at a glance.
+• Every number explainable: "why is today 63%?" and "why am I level 12?" always have an answer.
+• Data stays on the user's PC, survives at least a year, and is backed up automatically.
+• Windows 10 first, cross-platform later (Windows 11, Linux), phone sync later.
+Non-goals (not built now)
+• Accounts, cloud, sync, licensing, selling infrastructure.
+• AI coach, social features, leaderboards.
+• XP loss or penalties, judgmental language ("failed").
+• Hardcoded religious content. The user supplies all spiritual text.
+• Pure-Rust UI toolkits (egui, iced, Slint). Rejected: weak at polished motion and typography, and no browser preview.
+3. User and principles
+User: one person, using the app daily, starting at wake-up.
+Principles
+1. Goals define direction; habits and practices define who the user becomes; projects define what is built; tasks define what is executed; Today defines what matters now.
+2. Do not blur entities: a task, habit, goal, project, practice and workout are different things.
+3. Progress must be explainable. No arbitrary numbers.
+4. History is append-only and never rewritten.
+5. No penalties. A miss earns nothing and is recorded neutrally.
+6. Quiet by default: motion only at Begin Day, score count-up and level-ups.
+4. Technical stack
+Layer
+Choice
+Shell
+Tauri 2
+Logic and storage
+Rust (stable), Cargo workspace
+Database
+SQLite via rusqlite with the bundled feature (no native rebuild issues)
+UI
+React + TypeScript (strict), Tailwind with design tokens, Zustand
+Motion
+Framer Motion, limited to approved moments
+Tauri plugins
+autostart, notification, single-instance
+Rust crates
+serde, serde_json, chrono, uuid, thiserror, ts-rs (generated TS types)
+Tests
+cargo test (Rust), Vitest (UI), both gated
+No other dependency is added without approval.
+5. Architecture
+productivity-os/
+├── Cargo.toml                 (workspace)
+├── crates/
+│   ├── core/                  PURE Rust: score, xp, transitions, day close,
+│   │                          dayKey, recurrence, retention, migration planner.
+│   │                          No I/O, no clock, no database, no Tauri.
+│   ├── store/                 SQLite adapter, migrations, backups, export/import.
+│   │                          Implements the Storage trait.
+│   └── app/ (src-tauri)       Tauri commands, tray, autostart, notifications.
+│       └── os/                OS-specific code isolated here.
+├── ui/                        React + TS + Tailwind
+├── docs/decisions/            one short record per locked decision
+└── CLAUDE.md                  standing rules for the coding agent
+Architecture rules
+• core is pure. The clock (Clock trait) and id generator (IdGen trait) are injected, never called directly.
+• The UI never touches the database. It calls typed Tauri commands only. Inputs are validated at the command boundary.
+• TypeScript types for every command payload are generated from Rust structs, never hand-written.
+• The UI must feature-detect Tauri. In a plain browser (live preview) it runs on an in-memory mock and never crashes.
+• Never hardcode file paths. Use Tauri's path API.
+• OS-specific behavior (autostart, tray) lives only in app/os/.
+6. Data model
+Rules for every record: UUID id, created_at, updated_at, deleted_at (soft delete). Instants are UTC ISO-8601. Local dates are YYYY-MM-DD after applying the rollover hour.
+Storage shape: one records table: table_name, id, created_at, updated_at, deleted_at, data (JSON), primary key (table_name, id). Migration 002 adds an index on dayKey for quest_entries and day_records. High-volume tables may get dedicated columns in later migrations, before a year of data accumulates. Migrations are numbered, versioned with PRAGMA user_version, applied one per transaction, and preceded by an automatic backup.
+Entity
+Key fields
+areas
+name, color, sort order (Career, Learning, Fitness, Spiritual, Personal, Finance; custom later)
+goals
+name, area, period (daily / weekly / monthly / one-time / ongoing), method (numeric / milestones / tasks), target, unit, deadline, status (active / paused / completed / archived)
+milestones
+goal, name, target value, completed at
+projects
+name, goal?, area, status
+tasks
+title, project?, tier, due date?, status
+task_goal_links
+task, goal
+habits
+name, area, schedule, target, unit, tier, active
+practices
+name, type, user-provided text, repetition target, schedule, tier
+workout_templates, exercises, template_exercises
+training plans
+workout_sessions, set_logs
+date, completion %, per-set reps/duration
+day_records
+day key, rest day flag, began at (wake), target wake, closed at, score, breakdown
+quest_entries
+day key, source type and id, name, tier, target, progress, status, reason, resolved at, reclassifiable until
+progress_events
+entry, delta, at (append-only; Undo is a compensating event)
+goal_period_results
+goal, period key, target, achieved, outcome (met / partial / missed)
+focus_sessions
+planned, actual, date, linked task / project / goal
+settings
+target wake time, rollover hour, tier weights, ruleset version
+Snapshot principle: at Begin Day, today's due items are copied into quest_entries with name, tier and target frozen. Later edits to a habit never rewrite history.
+Derived, never stored: XP, levels, ranks, streaks, consistency %, goal progress %. The daily score is stored once at day close with its breakdown, so old scores stay stable if formulas change.
+7. Business rules (locked)
+7.1 Day and rollover
+• The day rolls over at 04:00 local (configurable). Work at 01:30 belongs to the previous day.
+• dayKey(date, rolloverHour): subtract the rollover hours, return the local date.
+• boundary(dayKey, rolloverHour): the local instant rolloverHour:00:00.000 on that date. One millisecond before it belongs to the previous day.
+• Reclassify deadline of an entry for day D = boundary(D + 2 days), computed once at creation and stored.
+7.2 Tiers and statuses
+• Tiers: Core, Standard, Bonus. Defaults: workouts and Main Quests Core, habits Standard, extras Bonus. User can override.
+• Statuses: pending, done, partial, skipped, missed, carried, dropped.
+• Skipped = deliberately excused (excluded from the score). Missed = did not happen (counts as zero earned). Wording is always neutral. An optional one-tap reason (sick, travel, low energy, overloaded, other) feeds reports.
+7.3 Daily score
+• Weights: Core 3, Standard 2, Bonus 0.
+• due weight = sum of weights of Core and Standard entries, excluding skipped.
+• Earned fraction: done 1; partial = clamp(progress / target, 0, 1), with target 0 giving 1 if progress > 0 else 0; missed, dropped, carried and pending 0.
+• Base score = earned weight / due weight × 100. If due weight is 0, the score is 0, and the UI shows "No quests today" instead of "0%".
+• Bonus entries add 2.5 points × earned fraction each, capped at +10. Final score = min(100, round to 1 decimal).
+• The breakdown lists every entry, so tapping the score always shows why.
+7.4 Entry lifecycle
+• mark_done, mark_partial (clamped to 0..target; at target becomes done), mark_skipped, undo, reclassify.
+• undo is allowed only before the reclassify deadline. reclassify is allowed only from missed, to skipped, carried or dropped, before the deadline.
+• Marking done or partial on a skipped, carried or dropped entry is an error.
+• Day close turns every pending entry into missed. Carried items become a new entry on the day they land.
+7.5 XP, levels, ranks
+• XP per entry = tier XP × earned fraction. Tier XP: Core 30, Standard 15, Bonus 5.
+• Daily caps per tier: Core 90, Standard 60, Bonus 10 (anti-farming).
+• Weekly bonus: 25 XP for each weekly or monthly goal whose outcome is met. Uncapped.
+• Levels follow a gently rising curve, per area and overall. Ranks use original names. No XP loss, ever.
+• XP is always computed from records, so a formula change recalculates history instead of corrupting it.
+7.6 Goals
+• Each goal has exactly one measurement method (numeric, milestones, or linked tasks). Methods are never mixed.
+• A task may link to several goals; each goal counts it by its own method.
+• Tiny tasks must not inflate big goals.
+• Weekly and monthly goals record an outcome per period (met, partial, missed). History is never overwritten.
+7.7 Wake time and rest days
+• Wake time is stamped when the user presses Begin Day, never at app launch.
+• A rest day is excluded from percentages and streaks but still stored.
+8. Features by tier
+Tier
+Features
+MVP
+App shell, storage and backups, Today with quest list, daily score and "why" breakdown, day close with Missed marking, Goals (all periods and methods), Habits, Begin Day with wake time, autostart
+v1
+Spiritual practices with counter, Fitness with partial completion, Focus timer linked to work, Weekly and monthly reports, XP, levels, ranks, Calendar history
+Later
+Notifications and reminders, Schedule / time-blocking, Phone sync, Custom areas, Equipment and progression
+8.1 Today (hero screen)
+• Top: greeting, level and rank, streak.
+• One focal element: "N quests remaining" and a Begin Day button. After Begin Day, the button becomes the quest list.
+• Compact progress lines for Today, This week, This month. Tapping the score shows the breakdown.
+• Main Quests (user picks 3), then Daily Quests (automatic).
+• No widget walls. Skip, defer or add any item in one tap.
+8.2 Begin Day (guided, skippable)
+Check-in → Carry-over review → Practice → Intention → Workout → Pick 3 Main Quests → Schedule → Today
+• Every step is skippable or can be disabled in settings. "Skip to dashboard" is always visible.
+• Carry-over review: yesterday's unfinished items appear as suggestions; the user carries, reschedules or drops each.
+• Main Quest suggestions: overdue items, deadlines, tasks linked to goals behind pace.
+8.3 Habits
+Recurrence: daily, weekdays, selected days, X times per week, every X days. Streak, best streak and consistency % are derived. Streaks are never the primary motivator.
+8.4 Spiritual practice
+Count-based counter (47 / 108, +1, +10, Undo, Reset, Finish). Multiple practices per day. User-provided text only. A mala-style visual only if it clearly helps.
+8.5 Fitness
+Workout templates (Push, Pull, Legs, Core, Full Body, Conditioning, Mobility, custom), sets, reps, duration, rest, partial completion, history. Lean, athletic direction. No AI coach.
+8.6 Focus
+Timer linked to a task, project, goal or area. Stores planned and actual duration. Answers: "How much focused time did I invest in this goal?"
+8.7 Reports and calendar
+Weekly and monthly reviews: overall %, goal progress, habit, workout and spiritual consistency, focus time, best day, weakest area, skip and miss reasons, carried priorities. Calendar shows per-day completion; clicking a day opens its history. No decorative charts.
+8.8 Launch behavior
+Starts with Windows. First launch of the day opens Begin Day. Later launches start quietly in the tray.
+9. UX and visual spec
+• Navigation: slim left rail (Today, Goals, Habits, Practice, Fitness, Work, Focus, Reports, Settings) plus a command palette (Ctrl+K).
+• Theme: dark by default, light as override, same tokens. Near-black with a cool tint, hairline dividers, one accent, 2–4 px corners.
+• Type: system sans for UI, tabular monospaced numerals for all stats. Scale 12 / 14 / 16 / 20 / 28 / 48 px.
+• Spacing: 4 px scale (4, 8, 12, 16, 24, 32, 48, 64).
+• Layout: rows and lists, not card grids. One focal element per screen.
+• Avoid: glassmorphism, constant glow, gradients, shadows, badges everywhere, decorative charts.
+• Motion: 120 ms / 240 ms. Only for Begin Day, score count-up, level-up. Respect reduced motion.
+• States: every screen designs empty, loading, error and completed states.
+• Accessibility: full keyboard use, visible focus, contrast-checked tokens.
+• Tokens (dark): bg #0B0D12, surface #11141B, raised #171B24, line #232833, text #E6E9EF, muted #8A93A6, accent #4C9AFF, done #3FB68B, missed #D9666B, warn #D9A441. Light tokens as defined in the existing token file.
+• Original design only. No Solo Leveling names, art or assets.
+10. Data safety
+• Metrics are append-only; deletes are soft.
+• Backups via SQLite's online backup API: daily snapshot due after 24 h, weekly after 7 days, monthly after 28 days. Retention: daily 30 days, weekly 365 days, monthly forever. Boundary: kept at exactly the limit, deleted one day past.
+• A backup is taken before every migration. Failed migrations roll back.
+• Backup failures are logged and never crash startup.
+• JSON export and import (schema-versioned). Import runs in one transaction and rolls back fully on any row error.
+• Configurable backup folder (can point at OneDrive, Google Drive or USB).
+• Media is stored separately from metrics.
+11. Quality and testing
+• TDD for all core logic: tests first, confirm they fail, implement the minimum.
+• The existing 113 TypeScript tests are the specification for the Rust port; each is translated before its module is implemented.
+• The Storage trait has one shared contract test suite that both the in-memory and SQLite implementations must pass.
+• Gates for every task: cargo fmt --check, cargo clippy -D warnings, cargo test, then UI tsc --noEmit, lint and Vitest. A task is not done until all pass.
+• Debugging protocol: reproduce, isolate, state a hypothesis, fix the root cause, add a regression test. No guess-patching.
+• UI work has explicit verification checklists instead of unit tests.
+12. Delivery approach
+Build environment
+• Platform (Linux): cargo test, tsc, Vitest and the browser live preview.
+• The Windows .exe is built on the user's PC after download (Rust toolchain plus Microsoft C++ Build Tools). Steps will be written when that point is reached.
+• Anything needing a real Tauri process (DB file on disk, tray, autostart, notifications) is tracked as an unverified list and checked in one local verification pass.
+Coding-agent workflow (Qwen Flash)
+• CLAUDE.md carries the standing rules so each prompt stays short.
+• Every task has six parts: Scope, Context, Constraints, Implementation, Verification, Stop condition.
+• At most 3 files per task, sized for roughly a 32K context. Never "read the whole codebase".
+• The architect reviews every report for drift before the next task.
+• Each task reports files changed, gate results and test counts. Unexplained changes to config files are questioned.
+13. Roadmap
+Phase
+Content
+R0
+Cargo workspace, Tauri shell, UI scaffold, tokens, CLAUDE.md, Rust smoke test, browser preview with mock
+R1
+Port core: dayKey, record helpers, migration planner, retention, schedule, export shape
+R2
+Port core: quest entry, score, transitions, day close, create entry, XP
+R3
+store: Storage trait, in-memory impl, SQLite impl, migrations 001–002, backups, export/import
+R4
+Tauri commands, typed IPC, generated types, tray, autostart
+R5
+Today screen, Begin Day trigger, day close
+R6
+Goals
+R7
+Habits and streaks
+R8
+Begin Day full flow, wake tracking, carry-over
+R9
+Spiritual practice
+R10
+Fitness
+R11
+Focus and calendar history
+R12
+XP, levels, ranks, reports
+R13
+Notifications, scheduling, polish
+LV
+One local verification pass on the user's PC, then Windows installer
+Phases R1 to R3 are a one-time port of work already done in TypeScript. Each phase is split into slices: decision record, tests, minimal implementation, verification, review.
+14. Risks
+Risk
+Mitigation
+Platform has no Rust toolchain
+Smoke test is the first task; fallback is a local Rust build
+Cannot build Windows .exe on the platform
+Build locally; platform verifies logic and UI only
+Qwen Flash is weaker at Rust
+Tiny tasks, tests first, strict clippy, translated tests as the spec
+Tauri behavior untestable on platform
+Isolate in app/os/; track on the unverified list
+Quota limits
+Small tasks that finish inside one session; report state if cut off
+WebView differences across OS
+Plain CSS and React only; no exotic browser APIs
+Data loss over a year
+Backups, soft delete, append-only metrics, export
+15. Open questions
+1. Reaction to the design tokens (too cold, dark or small)? Not yet answered.
+2. Real habits and goals to use as seed data, or invented placeholders?
+3. Level curve and rank names (proposed by the architect once the XP port is done).
+4. Does the platform allow choosing the model, and how is quota counted?
+16. Acceptance criteria for v1
+• The app installs and starts with Windows, opens Begin Day on first launch of the day, and sits in the tray afterwards.
+• Today shows quests, a score with a working "why" breakdown, and "No quests today" when nothing is due.
+• A day closes into Missed entries; reclassify works until the stored deadline.
+• Data persists across restarts and lives in a visible file on the PC.
+• Backups appear on schedule and retention behaves as specified.
+• Export then import on a clean install restores all data.
+• All gates pass; every core rule above has a test.

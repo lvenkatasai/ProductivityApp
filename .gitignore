@@ -1,0 +1,24 @@
+# Rust
+target/
+Cargo.lock
+
+# Node / UI
+ui/node_modules/
+ui/dist/
+ui/.vite/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Tauri build outputs
+src-tauri/target/
+*.exe
+*.msi
+
+# Antigravity agent scratchfiles (keep skills)
+.agents/skills/
