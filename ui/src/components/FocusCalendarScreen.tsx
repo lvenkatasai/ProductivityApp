@@ -109,7 +109,7 @@ const DayDetailPanel: React.FC<{
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="bg-surface border border-line rounded-md w-full max-w-sm mx-4 shadow-2xl">
+      <div className="bg-surface border border-line rounded-md w-full max-w-sm mx-4 animate-fadeRise">
         <div className="flex items-center justify-between px-5 py-4 border-b border-line">
           <div>
             <h2 className="text-sm font-bold text-text">{date}</h2>

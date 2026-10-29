@@ -74,7 +74,11 @@ export const TodayScreen: React.FC = () => {
               <span className="text-xs text-faint">{mainQuests.filter(q => q.status === 'done').length} of {mainQuests.length} done · weight 3x</span>
             </div>
             <div className="space-y-2">
-              {mainQuests.map((quest) => (
+              {mainQuests.length === 0 ? (
+                <p className="text-xs text-faint text-center py-6">
+                  No main quests yet. Begin your day to load the plan you set.
+                </p>
+              ) : mainQuests.map((quest) => (
                 <QuestRow
                   key={quest.id}
                   quest={quest}
@@ -126,7 +130,11 @@ export const TodayScreen: React.FC = () => {
               <span className="text-xs text-faint">standard 2x · bonus +2.5</span>
             </div>
             <div className="space-y-2">
-              {dailyQuests.map((quest) => (
+              {dailyQuests.length === 0 ? (
+                <p className="text-xs text-faint text-center py-6">
+                  No standard or bonus quests yet.
+                </p>
+              ) : dailyQuests.map((quest) => (
                 <QuestRow
                   key={quest.id}
                   quest={quest}

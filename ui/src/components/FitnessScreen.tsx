@@ -63,7 +63,7 @@ const AddExerciseModal: React.FC<AddExerciseModalProps> = ({ isOpen, onClose, on
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="bg-surface border border-line rounded-md w-full max-w-sm mx-4 shadow-2xl">
+      <div className="bg-surface border border-line rounded-md w-full max-w-sm mx-4 animate-fadeRise">
         <div className="flex items-center justify-between px-5 py-4 border-b border-line">
           <h2 className="text-sm font-bold text-text">Add Exercise</h2>
           <button onClick={onClose} className="text-muted hover:text-text p-1 rounded transition-colors">
@@ -276,7 +276,7 @@ const DayPlanCard: React.FC<DayPlanCardProps> = ({ day, isToday }) => {
           <div className="border-t border-line px-4 py-3 space-y-3">
             {plan.exercises.length === 0 && (
               <p className="text-xs text-muted text-center py-3">
-                No exercises yet — add one below.
+                No exercises yet. Add one below.
               </p>
             )}
 

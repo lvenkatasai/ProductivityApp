@@ -679,8 +679,7 @@ export const PracticeScreen: React.FC = () => {
           <Sparkles className="w-12 h-12 text-muted/30" />
           <div>
             <h3 className="text-sm font-bold text-text">No practices yet</h3>
-            <p className="text-xs text-muted mt-1">
-              Create your first practice â€” add a mantra, audio, image, or video to guide you.
+            <p className="text-xs text-muted mt-1">Create your first practice. Add a mantra, audio, image, or video to guide you.
             </p>
           </div>
           <button

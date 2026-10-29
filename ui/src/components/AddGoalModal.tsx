@@ -62,7 +62,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-fadeIn">
-      <div className="w-full max-w-md bg-surface border border-line rounded p-6 shadow-2xl flex flex-col justify-between max-h-[90vh] overflow-y-auto">
+      <div className="w-full max-w-md bg-surface border border-line rounded p-6 flex flex-col justify-between max-h-[90vh] overflow-y-auto animate-fadeRise">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="flex items-center justify-between border-b border-line pb-4">
             <div className="flex items-center gap-2">

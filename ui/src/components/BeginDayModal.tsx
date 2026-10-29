@@ -42,13 +42,13 @@ export const BeginDayModal: React.FC<BeginDayModalProps> = ({ isOpen, onClose })
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-fadeIn">
-      <div className="w-full max-w-xl bg-surface border border-line rounded p-6 shadow-2xl flex flex-col justify-between min-h-[460px]">
+      <div className="w-full max-w-xl bg-surface border border-line rounded p-6 flex flex-col justify-between min-h-[460px] animate-fadeRise">
         {/* Top Header */}
         <div>
           <div className="flex items-center justify-between border-b border-line pb-4">
             <div className="flex items-center gap-2">
               <SunMedium className="w-5 h-5 text-accent" />
-              <h2 className="text-base font-bold text-text">Begin Day â€¢ System Wakeup</h2>
+              <h2 className="text-base font-bold text-text">Begin Day · System Wakeup</h2>
             </div>
             <button 
               onClick={handleFinish} 
@@ -168,7 +168,7 @@ export const BeginDayModal: React.FC<BeginDayModalProps> = ({ isOpen, onClose })
                 <Dumbbell className="w-5 h-5 text-accent" />
                 <div>
                   <div className="text-xs font-semibold text-text">Push Day: 5x5 Barbell Press & Dips</div>
-                  <div className="text-[11px] text-muted font-stat">Target: 5 complete sets â€¢ Core Tier (3x)</div>
+                  <div className="text-[11px] text-muted font-stat">Target: 5 complete sets · Core Tier (3x)</div>
                 </div>
               </div>
             </div>
@@ -232,7 +232,7 @@ export const BeginDayModal: React.FC<BeginDayModalProps> = ({ isOpen, onClose })
           ) : (
             <button 
               onClick={handleFinish}
-              className="px-4 py-2 bg-done hover:bg-done/90 text-bg text-xs font-bold rounded transition-colors flex items-center gap-1.5"
+              className="px-4 py-2 bg-white hover:bg-white/90 text-[#111111] text-xs font-bold rounded transition-colors flex items-center gap-1.5"
             >
               Complete & Begin Today <Check className="w-3.5 h-3.5" />
             </button>
