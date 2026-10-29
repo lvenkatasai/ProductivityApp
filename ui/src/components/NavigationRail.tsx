@@ -36,7 +36,7 @@ export const NavigationRail: React.FC = () => {
             <div className="w-2.5 h-2.5 rounded bg-accent" />
             <span className="font-bold text-sm tracking-tight text-text">Productivity OS</span>
           </div>
-          <span className="text-[10px] text-muted font-mono bg-raised px-1.5 py-0.5 rounded border border-line">
+          <span className="text-[11px] text-muted font-stat bg-raised px-1.5 py-0.5 rounded border border-line">
             v1.0
           </span>
         </div>
@@ -70,7 +70,7 @@ export const NavigationRail: React.FC = () => {
           <span className="flex items-center gap-1.5">
             <Command className="w-3.5 h-3.5" /> Command
           </span>
-          <kbd className="font-mono text-[10px] text-muted">Ctrl+K</kbd>
+          <kbd className="font-mono text-[11px] text-muted">Ctrl+K</kbd>
         </div>
       </div>
     </aside>

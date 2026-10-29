@@ -12,7 +12,7 @@ export const HabitsScreen: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-line pb-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted">
+          <div className="flex items-center gap-2 text-xs font-medium text-muted">
             <CheckSquare className="w-4 h-4 text-accent" />
             <span>Identity & Discipline</span>
           </div>
@@ -61,7 +61,7 @@ interface HabitRowProps {
 
 const HabitRow: React.FC<HabitRowProps> = ({ habit, onToggleActive, onRemove }) => {
   return (
-    <div className="bg-surface border border-line rounded p-4 flex items-center justify-between hover:border-line/80 transition-all group">
+    <div className="bg-surface border border-line rounded p-4 flex items-center justify-between hover:border-line/80 transition group">
       <div className="flex items-center gap-4 flex-1 min-w-0">
         <div className={`w-2.5 h-2.5 rounded-full ${habit.active ? 'bg-done' : 'bg-muted'}`} />
 
@@ -70,14 +70,14 @@ const HabitRow: React.FC<HabitRowProps> = ({ habit, onToggleActive, onRemove }) 
             <span className="text-sm font-semibold text-text truncate">
               {habit.name}
             </span>
-            <span className={`text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded ${
+            <span className={`text-[11px] capitalize font-semibold px-1.5 py-0.5 rounded ${
               habit.tier === 'core' 
                 ? 'bg-accent/10 text-accent border border-accent/20' 
                 : 'bg-raised text-muted border border-line'
             }`}>
               {habit.tier}
             </span>
-            <span className="text-[10px] text-muted font-mono bg-raised px-1.5 py-0.5 rounded border border-line">
+            <span className="text-[11px] text-muted font-stat bg-raised px-1.5 py-0.5 rounded border border-line">
               {habit.area}
             </span>
           </div>
@@ -123,7 +123,7 @@ const HabitRow: React.FC<HabitRowProps> = ({ habit, onToggleActive, onRemove }) 
 
         <button
           onClick={onRemove}
-          className="text-muted hover:text-missed opacity-0 group-hover:opacity-100 transition-all p-1 hover:bg-raised rounded"
+          className="text-muted hover:text-missed opacity-0 group-hover:opacity-100 transition p-1 hover:bg-raised rounded"
           title="Remove habit"
         >
           <Trash2 className="w-4 h-4" />

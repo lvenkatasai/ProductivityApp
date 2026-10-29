@@ -8,7 +8,7 @@ export const WhyScoreDrawer: React.FC = () => {
   if (!showWhyDrawer) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 animate-fadeIn">
       <div className="w-full max-w-md bg-surface border-l border-line h-full flex flex-col justify-between p-6 overflow-y-auto">
         <div className="space-y-6">
           <div className="flex items-center justify-between border-b border-line pb-4">
@@ -26,7 +26,7 @@ export const WhyScoreDrawer: React.FC = () => {
 
           {/* Explainable Formula Box */}
           <div className="bg-raised p-4 rounded border border-line text-xs space-y-2 text-muted leading-relaxed">
-            <div className="font-semibold text-text uppercase tracking-wider text-[11px]">
+            <div className="font-semibold text-text text-xs">
               Deterministic Formula (PRD §7.3)
             </div>
             <p>
@@ -42,7 +42,7 @@ export const WhyScoreDrawer: React.FC = () => {
 
           {/* Breakdown Table */}
           <div className="space-y-3">
-            <div className="text-xs font-semibold text-muted uppercase tracking-wider">
+            <div className="text-xs font-semibold text-muted">
               Quest Contributions
             </div>
 
@@ -58,7 +58,7 @@ export const WhyScoreDrawer: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-muted text-[11px]">
-                    <span className="uppercase">{item.tier} • status: {item.status}</span>
+                    <span className="capitalize">{item.tier} • status: {item.status}</span>
                     <span className="font-stat">{(item.earned_fraction * 100).toFixed(0)}% completion</span>
                   </div>
                 </div>

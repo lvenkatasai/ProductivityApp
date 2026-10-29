@@ -61,7 +61,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-fadeIn">
       <div className="w-full max-w-md bg-surface border border-line rounded p-6 shadow-2xl flex flex-col justify-between max-h-[90vh] overflow-y-auto">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="flex items-center justify-between border-b border-line pb-4">
@@ -81,7 +81,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
           <div className="space-y-4">
             {/* Goal Title */}
             <div className="space-y-1.5">
-              <label className="text-[11px] font-semibold text-muted uppercase">Goal Name</label>
+              <label className="text-xs font-medium text-muted">Goal Name</label>
               <input
                 type="text"
                 required
@@ -95,7 +95,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
             {/* Area & Period */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label className="text-[11px] font-semibold text-muted uppercase">Life Area</label>
+                <label className="text-xs font-medium text-muted">Life Area</label>
                 <select
                   value={area}
                   onChange={(e) => setArea(e.target.value as any)}
@@ -111,7 +111,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[11px] font-semibold text-muted uppercase">Period</label>
+                <label className="text-xs font-medium text-muted">Period</label>
                 <select
                   value={period}
                   onChange={(e) => setPeriod(e.target.value as any)}
@@ -128,7 +128,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
 
             {/* Measurement Method (PRD §7.6: Strictly one method) */}
             <div className="space-y-1.5">
-              <label className="text-[11px] font-semibold text-muted uppercase">
+              <label className="text-xs font-medium text-muted">
                 Measurement Method (One Method Only)
               </label>
               <select
@@ -146,7 +146,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
             {method === 'numeric' && (
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-semibold text-muted uppercase">Target</label>
+                  <label className="text-xs font-medium text-muted">Target</label>
                   <input
                     type="number"
                     required
@@ -156,7 +156,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-semibold text-muted uppercase">Unit</label>
+                  <label className="text-xs font-medium text-muted">Unit</label>
                   <input
                     type="text"
                     required
@@ -171,21 +171,21 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
 
             {method === 'milestones' && (
               <div className="space-y-1.5">
-                <label className="text-[11px] font-semibold text-muted uppercase">
+                <label className="text-xs font-medium text-muted">
                   Milestones (One per line)
                 </label>
                 <textarea
                   rows={3}
                   value={milestonesText}
                   onChange={(e) => setMilestonesText(e.target.value)}
-                  className="w-full bg-bg border border-line rounded p-2.5 text-xs text-text focus:outline-none focus:border-accent font-mono"
+                  className="w-full bg-bg border border-line rounded p-2.5 text-xs text-text focus:outline-none focus:border-accent"
                 />
               </div>
             )}
 
             {/* Deadline */}
             <div className="space-y-1.5">
-              <label className="text-[11px] font-semibold text-muted uppercase">Deadline (Optional)</label>
+              <label className="text-xs font-medium text-muted">Deadline (Optional)</label>
               <input
                 type="date"
                 value={deadline}

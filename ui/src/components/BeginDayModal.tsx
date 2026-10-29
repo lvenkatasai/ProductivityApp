@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { 
   SunMedium, 
@@ -41,14 +41,14 @@ export const BeginDayModal: React.FC<BeginDayModalProps> = ({ isOpen, onClose })
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-fadeIn">
       <div className="w-full max-w-xl bg-surface border border-line rounded p-6 shadow-2xl flex flex-col justify-between min-h-[460px]">
         {/* Top Header */}
         <div>
           <div className="flex items-center justify-between border-b border-line pb-4">
             <div className="flex items-center gap-2">
-              <SunMedium className="w-5 h-5 text-accent animate-pulse" />
-              <h2 className="text-base font-bold text-text">Begin Day • System Wakeup</h2>
+              <SunMedium className="w-5 h-5 text-accent" />
+              <h2 className="text-base font-bold text-text">Begin Day â€¢ System Wakeup</h2>
             </div>
             <button 
               onClick={handleFinish} 
@@ -63,7 +63,7 @@ export const BeginDayModal: React.FC<BeginDayModalProps> = ({ isOpen, onClose })
             {STEPS.map((s, idx) => (
               <div 
                 key={s.id} 
-                className={`h-1 flex-1 rounded-full transition-all ${
+                className={`h-1 flex-1 rounded-full transition ${
                   idx <= step ? 'bg-accent' : 'bg-raised'
                 }`}
               />
@@ -73,7 +73,7 @@ export const BeginDayModal: React.FC<BeginDayModalProps> = ({ isOpen, onClose })
           {/* Step 0: Check-in */}
           {step === 0 && (
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-text uppercase tracking-wider text-accent">
+              <h3 className="text-sm font-semibold text-accent">
                 Step 1: Wake Time & Readiness
               </h3>
               <p className="text-xs text-muted leading-relaxed">
@@ -98,7 +98,7 @@ export const BeginDayModal: React.FC<BeginDayModalProps> = ({ isOpen, onClose })
           {/* Step 1: Carry-over */}
           {step === 1 && (
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-text uppercase tracking-wider text-accent">
+              <h3 className="text-sm font-semibold text-accent">
                 Step 2: Carry-Over Review
               </h3>
               <p className="text-xs text-muted">
@@ -119,7 +119,7 @@ export const BeginDayModal: React.FC<BeginDayModalProps> = ({ isOpen, onClose })
           {/* Step 2: Practice */}
           {step === 2 && (
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-text uppercase tracking-wider text-accent">
+              <h3 className="text-sm font-semibold text-accent">
                 Step 3: Spiritual / Focus Practice
               </h3>
               <p className="text-xs text-muted">
@@ -141,7 +141,7 @@ export const BeginDayModal: React.FC<BeginDayModalProps> = ({ isOpen, onClose })
           {/* Step 3: Intention */}
           {step === 3 && (
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-text uppercase tracking-wider text-accent">
+              <h3 className="text-sm font-semibold text-accent">
                 Step 4: Daily Intention
               </h3>
               <p className="text-xs text-muted">
@@ -158,7 +158,7 @@ export const BeginDayModal: React.FC<BeginDayModalProps> = ({ isOpen, onClose })
           {/* Step 4: Workout */}
           {step === 4 && (
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-text uppercase tracking-wider text-accent">
+              <h3 className="text-sm font-semibold text-accent">
                 Step 5: Fitness & Movement
               </h3>
               <p className="text-xs text-muted">
@@ -168,7 +168,7 @@ export const BeginDayModal: React.FC<BeginDayModalProps> = ({ isOpen, onClose })
                 <Dumbbell className="w-5 h-5 text-accent" />
                 <div>
                   <div className="text-xs font-semibold text-text">Push Day: 5x5 Barbell Press & Dips</div>
-                  <div className="text-[11px] text-muted font-stat">Target: 5 complete sets • Core Tier (3x)</div>
+                  <div className="text-[11px] text-muted font-stat">Target: 5 complete sets â€¢ Core Tier (3x)</div>
                 </div>
               </div>
             </div>
@@ -177,7 +177,7 @@ export const BeginDayModal: React.FC<BeginDayModalProps> = ({ isOpen, onClose })
           {/* Step 5: Pick 3 Main Quests */}
           {step === 5 && (
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-text uppercase tracking-wider text-accent">
+              <h3 className="text-sm font-semibold text-accent">
                 Step 6: Pick 3 Main Quests
               </h3>
               <p className="text-xs text-muted">
@@ -203,7 +203,7 @@ export const BeginDayModal: React.FC<BeginDayModalProps> = ({ isOpen, onClose })
                       }`}
                     >
                       <span>{entry.name}</span>
-                      <span className="font-stat">{isSelected ? '✓ Picked' : '+ Pick'}</span>
+                      <span className="font-stat">{isSelected ? 'âœ“ Picked' : '+ Pick'}</span>
                     </div>
                   );
                 })}

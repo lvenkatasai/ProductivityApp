@@ -22,7 +22,7 @@ export const ReportsScreen: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-line pb-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted">
+          <div className="flex items-center gap-2 text-xs font-medium text-muted">
             <Award className="w-4 h-4 text-accent" />
             <span>Honest Evaluation & Mastery</span>
           </div>
@@ -46,25 +46,25 @@ export const ReportsScreen: React.FC = () => {
       {/* Review Metrics Banner */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-surface border border-line rounded p-4">
-          <div className="text-xs text-muted uppercase font-medium">Weekly Overall</div>
+          <div className="text-xs text-muted font-medium">Weekly Overall</div>
           <div className="text-2xl font-bold font-stat text-done mt-1">88.4%</div>
           <div className="text-[11px] text-muted mt-1">+4.2% from last week</div>
         </div>
 
         <div className="bg-surface border border-line rounded p-4">
-          <div className="text-xs text-muted uppercase font-medium">Best Day</div>
+          <div className="text-xs text-muted font-medium">Best Day</div>
           <div className="text-2xl font-bold font-stat text-accent mt-1">Tuesday</div>
           <div className="text-[11px] text-muted mt-1">98.0% execution score</div>
         </div>
 
         <div className="bg-surface border border-line rounded p-4">
-          <div className="text-xs text-muted uppercase font-medium">Weakest Horizon</div>
+          <div className="text-xs text-muted font-medium">Weakest Horizon</div>
           <div className="text-2xl font-bold font-stat text-warn mt-1">Fitness</div>
           <div className="text-[11px] text-muted mt-1">3 of 4 sessions logged</div>
         </div>
 
         <div className="bg-surface border border-line rounded p-4">
-          <div className="text-xs text-muted uppercase font-medium">Total Focus Invested</div>
+          <div className="text-xs text-muted font-medium">Total Focus Invested</div>
           <div className="text-2xl font-bold font-stat text-text mt-1">14.5 hrs</div>
           <div className="text-[11px] text-muted mt-1">Across 18 sessions</div>
         </div>
@@ -72,7 +72,7 @@ export const ReportsScreen: React.FC = () => {
 
       {/* XP Progression per Life Area */}
       <div className="bg-surface border border-line rounded p-6 space-y-4">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-muted">
+        <h3 className="text-xs font-semibold text-muted">
           Mastery by Life Area (Rising Level Curves)
         </h3>
 
@@ -91,7 +91,7 @@ export const ReportsScreen: React.FC = () => {
                 </div>
                 <div className="w-full bg-raised rounded-full h-1.5 overflow-hidden">
                   <div
-                    className={`${item.color} h-full transition-all duration-300`}
+                    className={`${item.color} h-full transition-[width] duration-300`}
                     style={{ width: `${pct}%` }}
                   />
                 </div>
@@ -105,7 +105,7 @@ export const ReportsScreen: React.FC = () => {
       <div className="bg-surface border border-line rounded p-6 space-y-3">
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-accent" />
-          <h3 className="text-xs font-bold uppercase tracking-wider text-muted">
+          <h3 className="text-xs font-semibold text-muted">
             Neutral Reason Analysis (Non-Judgmental)
           </h3>
         </div>

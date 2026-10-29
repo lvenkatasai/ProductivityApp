@@ -108,7 +108,7 @@ const DayDetailPanel: React.FC<{
   const daySessions = sessions.filter((s) => s.date === date);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
       <div className="bg-surface border border-line rounded-md w-full max-w-sm mx-4 shadow-2xl">
         <div className="flex items-center justify-between px-5 py-4 border-b border-line">
           <div>
@@ -201,14 +201,14 @@ const FullCalendar: React.FC<{ sessions: FocusSession[] }> = ({ sessions }) => {
           </button>
           <button
             onClick={goToday}
-            className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border border-line hover:border-accent text-muted hover:text-accent transition-colors"
+            className="text-[11px] font-semibold px-2 py-1 rounded border border-line hover:border-accent text-muted hover:text-accent transition-colors"
           >
             Today
           </button>
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-3 text-[10px] font-stat text-muted">
+        <div className="flex items-center gap-3 text-[11px] font-stat text-muted">
           <span className="flex items-center gap-1">
             <span className="w-2.5 h-2.5 rounded-sm bg-done/30" /> 80%+
           </span>
@@ -227,7 +227,7 @@ const FullCalendar: React.FC<{ sessions: FocusSession[] }> = ({ sessions }) => {
       {/* Day-of-week headers */}
       <div className="grid grid-cols-7 gap-1">
         {DAY_ABBR.map((d) => (
-          <div key={d} className="text-[10px] font-bold uppercase tracking-wider text-muted text-center py-1">
+          <div key={d} className="text-[11px] font-semibold text-muted text-center py-1">
             {d}
           </div>
         ))}
@@ -252,7 +252,7 @@ const FullCalendar: React.FC<{ sessions: FocusSession[] }> = ({ sessions }) => {
               key={dateStr}
               onClick={() => !isFuture && setSelectedDate(dateStr)}
               disabled={isFuture}
-              className={`relative min-h-[56px] p-1.5 rounded border flex flex-col items-center gap-0.5 transition-all
+              className={`relative min-h-[56px] p-1.5 rounded border flex flex-col items-center gap-0.5 transition
                 ${isFuture ? 'border-line/20 text-muted/25 cursor-default' : 'cursor-pointer hover:border-text/60'}
                 ${isToday ? '!border-accent ring-1 ring-accent/30' : ''}
                 ${!isFuture ? scoreColor(score) : 'bg-bg'}
@@ -267,7 +267,7 @@ const FullCalendar: React.FC<{ sessions: FocusSession[] }> = ({ sessions }) => {
               </span>
 
               {score && !isFuture && (
-                <span className="text-[10px] font-stat font-semibold leading-none">{score.score}%</span>
+                <span className="text-[11px] font-stat font-semibold leading-none">{score.score}%</span>
               )}
 
               {hasSessions && !isFuture && (
@@ -340,7 +340,7 @@ export const FocusCalendarScreen: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-line pb-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted">
+          <div className="flex items-center gap-2 text-xs font-medium text-muted">
             <Timer className="w-4 h-4 text-accent" />
             <span>Investment & History</span>
           </div>
@@ -378,7 +378,7 @@ export const FocusCalendarScreen: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Timer card */}
           <div className="bg-surface border border-line rounded p-8 flex flex-col items-center space-y-6">
-            <div className="text-xs uppercase font-bold tracking-wider text-muted">Deep Work Interval</div>
+            <div className="text-xs font-semibold text-muted">Deep Work Interval</div>
 
             {/* Mode selector */}
             <div className="flex gap-2">
@@ -409,7 +409,7 @@ export const FocusCalendarScreen: React.FC = () => {
                   strokeDasharray={`${2 * Math.PI * 52}`}
                   strokeDashoffset={`${2 * Math.PI * 52 * (1 - totalPct / 100)}`}
                   strokeLinecap="round"
-                  className="transition-all duration-1000"
+                  className="transition-[stroke-dashoffset] duration-1000"
                 />
               </svg>
               <span className="text-4xl font-extrabold font-stat text-text tracking-tighter">
@@ -419,7 +419,7 @@ export const FocusCalendarScreen: React.FC = () => {
 
             {/* Linked input */}
             <div className="w-full max-w-xs space-y-1">
-              <label className="text-[10px] font-semibold text-muted uppercase tracking-wider">
+              <label className="text-xs font-medium text-muted">
                 Linked Goal or Task
               </label>
               <input
@@ -451,7 +451,7 @@ export const FocusCalendarScreen: React.FC = () => {
           {/* Sessions log */}
           <div className="bg-surface border border-line rounded p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-line pb-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-muted">
+              <h3 className="text-xs font-semibold text-muted">
                 Completed Sessions
               </h3>
               <span className="text-xs font-stat text-accent font-semibold">

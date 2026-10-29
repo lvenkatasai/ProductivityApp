@@ -36,8 +36,8 @@ export const TodayScreen: React.FC = () => {
       {/* Top Header: Greeting, Rank, Streaks */}
       <div className="flex items-center justify-between border-b border-line pb-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted">
-            <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+          <div className="flex items-center gap-2 text-xs font-medium text-muted">
+            <span className="w-2 h-2 rounded-full bg-done" />
             <span>Productivity OS • System Active</span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-text mt-1">
@@ -64,10 +64,10 @@ export const TodayScreen: React.FC = () => {
         {/* Score Card with tap-to-explain */}
         <div 
           onClick={() => setShowWhyDrawer(true)}
-          className="bg-surface border border-line hover:border-accent/50 transition-all rounded p-5 cursor-pointer group flex flex-col justify-between"
+          className="bg-surface border border-line hover:border-accent/50 transition rounded p-5 cursor-pointer group flex flex-col justify-between"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted uppercase tracking-wider">Today's Score</span>
+            <span className="text-xs font-medium text-muted">Today's Score</span>
             <span className="text-xs text-accent flex items-center gap-1 opacity-80 group-hover:opacity-100">
               Why? <HelpCircle className="w-3.5 h-3.5" />
             </span>
@@ -89,7 +89,7 @@ export const TodayScreen: React.FC = () => {
           </div>
           <div className="w-full bg-raised rounded-full h-1.5 overflow-hidden">
             <div 
-              className="bg-accent h-full transition-all duration-300"
+              className="bg-accent h-full transition-[width] duration-300"
               style={{ width: `${Math.min(scoreResult.final_score, 100)}%` }}
             />
           </div>
@@ -98,7 +98,7 @@ export const TodayScreen: React.FC = () => {
         {/* Action Center / Remaining */}
         <div className="bg-surface border border-line rounded p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted uppercase tracking-wider">Focus Status</span>
+            <span className="text-xs font-medium text-muted">Focus Status</span>
             <Target className="w-4 h-4 text-muted" />
           </div>
           <div className="my-2">
@@ -131,7 +131,7 @@ export const TodayScreen: React.FC = () => {
         {/* Aggregate Horizons */}
         <div className="bg-surface border border-line rounded p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted uppercase tracking-wider">Horizons</span>
+            <span className="text-xs font-medium text-muted">Horizons</span>
             <Calendar className="w-4 h-4 text-muted" />
           </div>
           <div className="space-y-2.5 my-2">
@@ -144,20 +144,20 @@ export const TodayScreen: React.FC = () => {
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-muted">This Month</span>
-              <span className="font-stat font-semibold text-accent">81.0%</span>
+              <span className="font-stat font-semibold text-done">81.0%</span>
             </div>
             <div className="w-full bg-raised rounded-full h-1 overflow-hidden">
-              <div className="bg-accent h-full w-[81%]" />
+              <div className="bg-done h-full w-[81%]" />
             </div>
           </div>
-          <div className="text-[11px] text-muted text-right">Append-only metrics</div>
+          <div className="text-[11px] text-muted text-right">History kept automatically</div>
         </div>
       </div>
 
       {/* Main Quests Section */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-text flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-accent" />
             Main Quests (High Impact)
           </h2>
@@ -179,7 +179,7 @@ export const TodayScreen: React.FC = () => {
       {/* Daily & Habit Quests Section */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-muted flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-text flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-muted" />
             Standard & Bonus Quests
           </h2>
@@ -214,7 +214,7 @@ const QuestRow: React.FC<QuestRowProps> = ({ quest, onToggle, onProgress }) => {
   const isMissed = quest.status === 'missed';
 
   return (
-    <div className={`flex items-center justify-between p-3.5 rounded bg-surface border transition-all ${
+    <div className={`flex items-center justify-between p-3.5 rounded bg-surface border transition ${
       isDone ? 'border-line/40 opacity-75' : isMissed ? 'border-missed/30' : 'border-line hover:border-line/80'
     }`}>
       <div className="flex items-center gap-3.5 flex-1 min-w-0">
@@ -238,7 +238,7 @@ const QuestRow: React.FC<QuestRowProps> = ({ quest, onToggle, onProgress }) => {
             <span className={`text-sm font-medium truncate ${isDone ? 'line-through text-muted' : 'text-text'}`}>
               {quest.name}
             </span>
-            <span className={`text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded ${
+            <span className={`text-[11px] capitalize font-semibold px-1.5 py-0.5 rounded ${
               quest.tier === 'core' 
                 ? 'bg-accent/10 text-accent border border-accent/20' 
                 : quest.tier === 'standard' 
@@ -263,7 +263,7 @@ const QuestRow: React.FC<QuestRowProps> = ({ quest, onToggle, onProgress }) => {
               {!isDone && (
                 <button
                   onClick={() => onProgress(quest.progress + 1)}
-                  className="text-[11px] font-mono px-1.5 py-0.5 bg-raised hover:bg-line text-text rounded border border-line"
+                  className="text-[11px] font-stat px-1.5 py-0.5 bg-raised hover:bg-line text-text rounded border border-line"
                 >
                   +1
                 </button>
@@ -276,7 +276,7 @@ const QuestRow: React.FC<QuestRowProps> = ({ quest, onToggle, onProgress }) => {
       <div className="flex items-center gap-2 text-xs text-muted flex-shrink-0">
         {isSkipped && <span className="text-muted italic">Skipped ({quest.reason || 'excused'})</span>}
         {isMissed && <span className="text-missed font-medium">Missed (0 pts)</span>}
-        <span className="text-[11px] font-mono text-muted/60">{quest.source_type}</span>
+        <span className="text-[11px] font-stat text-muted/60">{quest.source_type}</span>
       </div>
     </div>
   );

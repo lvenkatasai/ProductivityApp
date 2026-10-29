@@ -1,13 +1,13 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import {
   Compass, RotateCcw, Check, Plus, Trash2, X, ChevronDown, ChevronRight,
   FileText, Image, Volume2, Video, Upload, Sparkles, AlertCircle
 } from 'lucide-react';
 import { usePracticeStore, Practice, PracticeMedia, MediaType } from '../store/usePracticeStore';
 
-/* ══════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    AddPracticeModal
-   ══════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 interface AddPracticeModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -29,7 +29,7 @@ const MEDIA_ICON: Record<MediaType, React.FC<{ className?: string }>> = {
 const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) => {
   const { addPractice } = usePracticeStore();
 
-  // Step: 'basic' → 'media'
+  // Step: 'basic' â†’ 'media'
   const [step, setStep] = useState<'basic' | 'media'>('basic');
 
   // Basic fields
@@ -100,14 +100,14 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
       <div className="bg-surface border border-line rounded-md w-full max-w-md mx-4 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-line">
           <div>
             <h2 className="text-sm font-bold text-text">New Practice</h2>
             <p className="text-[11px] text-muted mt-0.5">
-              {step === 'basic' ? 'Step 1 of 2 — Details' : 'Step 2 of 2 — Media (optional)'}
+              {step === 'basic' ? 'Step 1 of 2 â€” Details' : 'Step 2 of 2 â€” Media (optional)'}
             </p>
           </div>
           <button onClick={handleClose} className="text-muted hover:text-text p-1 rounded transition-colors">
@@ -120,7 +120,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
           <div className="px-5 py-5 space-y-4">
             {/* Name */}
             <div>
-              <label className="text-[10px] uppercase font-semibold text-muted tracking-wider">
+              <label className="text-xs font-medium text-muted">
                 Practice Name <span className="text-missed">*</span>
               </label>
               <input
@@ -134,7 +134,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
                 autoFocus
               />
               {nameError && (
-                <p className="mt-1 text-[10px] text-missed flex items-center gap-1">
+                <p className="mt-1 text-[11px] text-missed flex items-center gap-1">
                   <AlertCircle className="w-3 h-3" /> {nameError}
                 </p>
               )}
@@ -142,7 +142,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
 
             {/* Repetitions (required) */}
             <div>
-              <label className="text-[10px] uppercase font-semibold text-muted tracking-wider">
+              <label className="text-xs font-medium text-muted">
                 Target Repetitions <span className="text-missed">*</span>
               </label>
               <input
@@ -156,7 +156,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
                 }`}
               />
               {repsError && (
-                <p className="mt-1 text-[10px] text-missed flex items-center gap-1">
+                <p className="mt-1 text-[11px] text-missed flex items-center gap-1">
                   <AlertCircle className="w-3 h-3" /> {repsError}
                 </p>
               )}
@@ -164,7 +164,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
 
             {/* XP */}
             <div>
-              <label className="text-[10px] uppercase font-semibold text-muted tracking-wider">XP Reward</label>
+              <label className="text-xs font-medium text-muted">XP Reward</label>
               <input
                 type="number"
                 min={5}
@@ -183,7 +183,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
                 onClick={goToMedia}
                 className="px-4 py-1.5 text-xs font-bold bg-accent hover:bg-accent/90 text-bg rounded transition-colors"
               >
-                Next: Media →
+                Next: Media â†’
               </button>
             </div>
           </div>
@@ -194,7 +194,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
           <div className="px-5 py-5 space-y-4">
             <p className="text-xs text-muted">
               Attach text notes, images, audio or video to this practice. All media is kept until you remove it.
-              This step is <span className="text-text font-semibold">optional</span> — skip to create immediately.
+              This step is <span className="text-text font-semibold">optional</span> â€” skip to create immediately.
             </p>
 
             {/* Media type selector */}
@@ -263,7 +263,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
             {/* Attached media list */}
             {mediaList.length > 0 && (
               <div className="space-y-2">
-                <div className="text-[10px] uppercase font-semibold text-muted tracking-wider">
+                <div className="text-xs font-medium text-muted">
                   Attached ({mediaList.length})
                 </div>
                 {mediaList.map((m, idx) => {
@@ -275,7 +275,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
                     >
                       <Icon className="w-4 h-4 text-accent flex-shrink-0" />
                       <span className="text-muted truncate flex-1">
-                        {m.type === 'text' ? m.content.slice(0, 40) + (m.content.length > 40 ? '…' : '') : m.filename}
+                        {m.type === 'text' ? m.content.slice(0, 40) + (m.content.length > 40 ? 'â€¦' : '') : m.filename}
                       </span>
                       <button
                         onClick={() => setMediaList((prev) => prev.filter((_, i) => i !== idx))}
@@ -291,7 +291,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
 
             <div className="flex justify-between gap-2 pt-1">
               <button onClick={() => setStep('basic')} className="px-3 py-1.5 text-xs text-muted hover:text-text border border-line rounded transition-colors">
-                ← Back
+                â† Back
               </button>
               <div className="flex gap-2">
                 <button
@@ -315,9 +315,9 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
   );
 };
 
-/* ══════════════════════════════════════════════════════════
-   MediaViewer — renders one piece of attached media
-   ══════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   MediaViewer â€” renders one piece of attached media
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const MediaViewer: React.FC<{
   media: PracticeMedia;
   onRemove: () => void;
@@ -329,7 +329,7 @@ const MediaViewer: React.FC<{
       {/* Remove button */}
       <button
         onClick={onRemove}
-        className="absolute top-1.5 right-1.5 z-10 p-1 rounded bg-black/50 text-muted hover:text-missed opacity-0 group-hover:opacity-100 transition-all"
+        className="absolute top-1.5 right-1.5 z-10 p-1 rounded bg-black/50 text-muted hover:text-missed opacity-0 group-hover:opacity-100 transition"
         title="Remove media"
       >
         <X className="w-3 h-3" />
@@ -350,7 +350,7 @@ const MediaViewer: React.FC<{
             className="w-full max-h-48 object-contain bg-black/20"
           />
           {media.filename && (
-            <div className="px-3 py-1.5 flex items-center gap-1.5 text-[10px] text-muted">
+            <div className="px-3 py-1.5 flex items-center gap-1.5 text-[11px] text-muted">
               <Image className="w-3 h-3" /> {media.filename}
             </div>
           )}
@@ -361,7 +361,7 @@ const MediaViewer: React.FC<{
         <div className="p-3 flex items-center gap-3">
           <Volume2 className="w-4 h-4 text-accent flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <div className="text-[10px] text-muted mb-1 truncate">{media.filename}</div>
+            <div className="text-[11px] text-muted mb-1 truncate">{media.filename}</div>
             <audio controls src={media.content} className="w-full h-8" />
           </div>
         </div>
@@ -375,7 +375,7 @@ const MediaViewer: React.FC<{
             className="w-full max-h-48 bg-black/40"
           />
           {media.filename && (
-            <div className="px-3 py-1.5 flex items-center gap-1.5 text-[10px] text-muted">
+            <div className="px-3 py-1.5 flex items-center gap-1.5 text-[11px] text-muted">
               <Video className="w-3 h-3" /> {media.filename}
             </div>
           )}
@@ -385,9 +385,9 @@ const MediaViewer: React.FC<{
   );
 };
 
-/* ══════════════════════════════════════════════════════════
-   PracticeCard — single expandable practice
-   ══════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   PracticeCard â€” single expandable practice
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 interface PracticeCardProps {
   practice: Practice;
   index: number;
@@ -430,8 +430,8 @@ const PracticeCard: React.FC<PracticeCardProps> = ({ practice, index }) => {
 
   return (
     <div
-      className={`bg-surface border rounded transition-all ${
-        done ? 'border-done/40 shadow-lg shadow-done/5' : 'border-line'
+      className={`bg-surface border rounded transition ${
+        done ? 'border-done/40' : 'border-line'
       }`}
     >
       {/* Card header */}
@@ -452,13 +452,13 @@ const PracticeCard: React.FC<PracticeCardProps> = ({ practice, index }) => {
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold text-text">{practice.name}</span>
               {done && (
-                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-done/15 text-done border border-done/30">
+                <span className="text-[11px] font-semibold capitalize px-1.5 py-0.5 rounded bg-done/15 text-done border border-done/30">
                   Complete
                 </span>
               )}
             </div>
             <div className="text-[11px] text-muted font-stat mt-0.5">
-              {practice.count} / {practice.reps} reps · {pct}% · +{practice.xp} XP
+              {practice.count} / {practice.reps} reps Â· {pct}% Â· +{practice.xp} XP
             </div>
           </div>
         </div>
@@ -505,7 +505,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({ practice, index }) => {
                     <button
                       key={t}
                       onClick={() => setAddMediaType(t)}
-                      className={`flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-semibold capitalize transition-colors ${
+                      className={`flex items-center gap-1.5 px-2 py-1 rounded border text-[11px] font-semibold capitalize transition-colors ${
                         addMediaType === t
                           ? 'bg-accent text-bg border-accent'
                           : 'border-line text-muted hover:border-text hover:text-text'
@@ -582,12 +582,12 @@ const PracticeCard: React.FC<PracticeCardProps> = ({ practice, index }) => {
                   strokeDashoffset={circumference - (circumference * practice.count) / practice.reps}
                   strokeLinecap="round"
                   fill="transparent"
-                  className="transition-all duration-300"
+                  className="transition-[stroke-dashoffset] duration-300"
                 />
               </svg>
               <div className="absolute flex flex-col items-center text-center">
                 <span className="text-4xl font-extrabold font-stat text-text">{practice.count}</span>
-                <span className="text-xs text-muted uppercase font-semibold tracking-wider mt-0.5">
+                <span className="text-xs text-muted font-medium mt-0.5">
                   of {practice.reps}
                 </span>
               </div>
@@ -598,14 +598,14 @@ const PracticeCard: React.FC<PracticeCardProps> = ({ practice, index }) => {
               <button
                 onClick={() => increment(practice.id, 1)}
                 disabled={done}
-                className="px-6 py-2.5 bg-accent hover:bg-accent/90 text-bg text-sm font-bold rounded transition-colors active:scale-95 shadow-lg shadow-accent/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 bg-accent hover:bg-accent/90 text-bg text-sm font-bold rounded transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 +1 Count
               </button>
               <button
                 onClick={() => increment(practice.id, 10)}
                 disabled={done}
-                className="px-4 py-2.5 bg-raised hover:bg-line text-text text-sm font-mono font-semibold rounded border border-line transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2.5 bg-raised hover:bg-line text-text text-sm font-stat font-semibold rounded border border-line transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 +10
               </button>
@@ -627,7 +627,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({ practice, index }) => {
             {done && (
               <div className="flex items-center gap-2 text-xs font-semibold text-done bg-done/10 px-3 py-1.5 rounded border border-done/20">
                 <Check className="w-4 h-4" />
-                Practice Complete · +{practice.xp} XP
+                Practice Complete Â· +{practice.xp} XP
               </div>
             )}
           </div>
@@ -637,9 +637,9 @@ const PracticeCard: React.FC<PracticeCardProps> = ({ practice, index }) => {
   );
 };
 
-/* ══════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    PracticeScreen (main)
-   ══════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export const PracticeScreen: React.FC = () => {
   const { practices } = usePracticeStore();
   const [showAddModal, setShowAddModal] = useState(false);
@@ -652,7 +652,7 @@ export const PracticeScreen: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-line pb-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted">
+          <div className="flex items-center gap-2 text-xs font-medium text-muted">
             <Compass className="w-4 h-4 text-accent" />
             <span>Spiritual & Mental Discipline</span>
           </div>
@@ -660,8 +660,8 @@ export const PracticeScreen: React.FC = () => {
             Practices & Repetition
           </h1>
           <p className="text-sm text-muted">
-            {practices.length} practice{practices.length !== 1 ? 's' : ''} ·{' '}
-            {totalDone} complete today · +{totalXp} XP earned
+            {practices.length} practice{practices.length !== 1 ? 's' : ''} Â·{' '}
+            {totalDone} complete today Â· +{totalXp} XP earned
           </p>
         </div>
 
@@ -680,7 +680,7 @@ export const PracticeScreen: React.FC = () => {
           <div>
             <h3 className="text-sm font-bold text-text">No practices yet</h3>
             <p className="text-xs text-muted mt-1">
-              Create your first practice — add a mantra, audio, image, or video to guide you.
+              Create your first practice â€” add a mantra, audio, image, or video to guide you.
             </p>
           </div>
           <button

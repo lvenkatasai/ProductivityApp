@@ -12,7 +12,7 @@ export const GoalsScreen: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-line pb-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted">
+          <div className="flex items-center gap-2 text-xs font-medium text-muted">
             <Target className="w-4 h-4 text-accent" />
             <span>Direction & Aspirations</span>
           </div>
@@ -65,11 +65,11 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal, onDelta, onToggleMilestone, o
   const pct = Math.min(Math.round((goal.current / goal.target) * 100), 100);
 
   return (
-    <div className="bg-surface border border-line rounded p-5 flex flex-col justify-between space-y-4 hover:border-line/80 transition-all group">
+    <div className="bg-surface border border-line rounded p-5 flex flex-col justify-between space-y-4 hover:border-line/80 transition group">
       <div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-raised text-muted border border-line">
+            <span className="text-[11px] capitalize font-semibold px-2 py-0.5 rounded bg-raised text-muted border border-line">
               {goal.area} • {goal.period}
             </span>
             {goal.deadline && (
@@ -80,7 +80,7 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal, onDelta, onToggleMilestone, o
           </div>
           <button
             onClick={onRemove}
-            className="text-muted hover:text-missed opacity-0 group-hover:opacity-100 transition-all p-1 hover:bg-raised rounded"
+            className="text-muted hover:text-missed opacity-0 group-hover:opacity-100 transition p-1 hover:bg-raised rounded"
             title="Remove goal"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -103,7 +103,7 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal, onDelta, onToggleMilestone, o
         {/* Progress Bar */}
         <div className="w-full bg-raised rounded-full h-1.5 mt-2 overflow-hidden">
           <div 
-            className="bg-accent h-full transition-all duration-300"
+            className="bg-accent h-full transition-[width] duration-300"
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -112,7 +112,7 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal, onDelta, onToggleMilestone, o
       {/* Milestones list if method is milestones */}
       {goal.method === 'milestones' && goal.milestones && (
         <div className="space-y-2 pt-2 border-t border-line/60">
-          <div className="text-[11px] font-semibold text-muted uppercase tracking-wider">
+          <div className="text-[11px] font-semibold text-muted">
             Milestones
           </div>
           <div className="space-y-1.5">
@@ -144,19 +144,19 @@ const GoalCard: React.FC<GoalCardProps> = ({ goal, onDelta, onToggleMilestone, o
         <div className="flex items-center justify-end gap-2 pt-2 border-t border-line/60">
           <button 
             onClick={() => onDelta(-10)}
-            className="px-2 py-1 text-xs font-mono bg-raised hover:bg-line text-text rounded border border-line"
+            className="px-2 py-1 text-xs font-stat bg-raised hover:bg-line text-text rounded border border-line"
           >
             -10
           </button>
           <button 
             onClick={() => onDelta(10)}
-            className="px-2 py-1 text-xs font-mono bg-raised hover:bg-line text-text rounded border border-line"
+            className="px-2 py-1 text-xs font-stat bg-raised hover:bg-line text-text rounded border border-line"
           >
             +10
           </button>
           <button 
             onClick={() => onDelta(50)}
-            className="px-2 py-1 text-xs font-mono bg-raised hover:bg-line text-text rounded border border-line"
+            className="px-2 py-1 text-xs font-stat bg-raised hover:bg-line text-text rounded border border-line"
           >
             +50
           </button>
