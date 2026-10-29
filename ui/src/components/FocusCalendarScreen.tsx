@@ -201,7 +201,7 @@ const FullCalendar: React.FC<{ sessions: FocusSession[] }> = ({ sessions }) => {
           </button>
           <button
             onClick={goToday}
-            className="text-[11px] font-semibold px-2 py-1 rounded border border-line hover:border-accent text-muted hover:text-accent transition-colors"
+            className="text-[11px] font-semibold px-2 py-1 rounded border border-line hover:border-faint text-muted hover:text-accent transition-colors"
           >
             Today
           </button>
@@ -357,7 +357,7 @@ export const FocusCalendarScreen: React.FC = () => {
           <button
             onClick={() => setActiveTab('timer')}
             className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors ${
-              activeTab === 'timer' ? 'bg-surface text-accent' : 'text-muted hover:text-text'
+              activeTab === 'timer' ? 'bg-raised text-text' : 'text-muted hover:text-text'
             }`}
           >
             Focus Timer
@@ -365,7 +365,7 @@ export const FocusCalendarScreen: React.FC = () => {
           <button
             onClick={() => setActiveTab('calendar')}
             className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors ${
-              activeTab === 'calendar' ? 'bg-surface text-accent' : 'text-muted hover:text-text'
+              activeTab === 'calendar' ? 'bg-raised text-text' : 'text-muted hover:text-text'
             }`}
           >
             Calendar
@@ -426,7 +426,7 @@ export const FocusCalendarScreen: React.FC = () => {
                 type="text"
                 value={linkedEntity}
                 onChange={(e) => setLinkedEntity(e.target.value)}
-                className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
               />
             </div>
 
@@ -434,7 +434,7 @@ export const FocusCalendarScreen: React.FC = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={toggleTimer}
-                className="px-6 py-2.5 bg-accent hover:bg-accent/90 text-bg text-xs font-bold rounded transition-colors flex items-center gap-1.5"
+                className="px-6 py-2.5 bg-white hover:bg-white/90 text-[#111111] text-xs font-bold rounded transition-colors flex items-center gap-1.5"
               >
                 {isRunning ? <><Pause className="w-4 h-4" /> Pause</> : <><Play className="w-4 h-4" /> Start</>}
               </button>

@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Compass, RotateCcw, Check, Plus, Trash2, X, ChevronDown, ChevronRight,
   FileText, Image, Volume2, Video, Upload, Sparkles, AlertCircle
@@ -129,7 +129,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. 108 Concentration Breath"
                 className={`mt-1 w-full bg-bg border rounded px-3 py-2 text-xs text-text focus:outline-none placeholder:text-muted/50 ${
-                  nameError ? 'border-missed focus:border-missed' : 'border-line focus:border-accent'
+                  nameError ? 'border-missed focus:border-missed' : 'border-line focus:border-muted'
                 }`}
                 autoFocus
               />
@@ -152,7 +152,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
                 onChange={(e) => setReps(e.target.value)}
                 placeholder="e.g. 108"
                 className={`mt-1 w-full bg-bg border rounded px-3 py-2 text-xs text-text focus:outline-none font-stat placeholder:text-muted/50 ${
-                  repsError ? 'border-missed focus:border-missed' : 'border-line focus:border-accent'
+                  repsError ? 'border-missed focus:border-missed' : 'border-line focus:border-muted'
                 }`}
               />
               {repsError && (
@@ -171,7 +171,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
                 step={5}
                 value={xp}
                 onChange={(e) => setXp(Number(e.target.value))}
-                className="mt-1 w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent font-stat"
+                className="mt-1 w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted font-stat"
               />
             </div>
 
@@ -181,7 +181,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
               </button>
               <button
                 onClick={goToMedia}
-                className="px-4 py-1.5 text-xs font-bold bg-accent hover:bg-accent/90 text-bg rounded transition-colors"
+                className="px-4 py-1.5 text-xs font-bold bg-white hover:bg-white/90 text-[#111111] rounded transition-colors"
               >
                 Next: Media â†’
               </button>
@@ -226,12 +226,12 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
                   onChange={(e) => setTextInput(e.target.value)}
                   placeholder="Enter your practice text, mantra, or instruction..."
                   rows={4}
-                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent resize-none placeholder:text-muted/50"
+                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted resize-none placeholder:text-muted/50"
                 />
                 <button
                   onClick={handleAddText}
                   disabled={!textInput.trim()}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-accent border border-accent/30 rounded hover:bg-accent/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-text border border-line rounded hover:bg-raised transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Plus className="w-3.5 h-3.5" /> Add Text
                 </button>
@@ -250,7 +250,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
                 />
                 <button
                   onClick={() => fileRef.current?.click()}
-                  className="w-full flex flex-col items-center gap-2 py-6 border-2 border-dashed border-line rounded hover:border-accent/50 hover:bg-accent/5 transition-colors"
+                  className="w-full flex flex-col items-center gap-2 py-6 border-2 border-dashed border-line rounded hover:border-faint/50 hover:bg-accent/5 transition-colors"
                 >
                   <Upload className="w-6 h-6 text-muted" />
                   <span className="text-xs text-muted">
@@ -302,7 +302,7 @@ const AddPracticeModal: React.FC<AddPracticeModalProps> = ({ isOpen, onClose }) 
                 </button>
                 <button
                   onClick={handleCreate}
-                  className="px-4 py-1.5 text-xs font-bold bg-accent hover:bg-accent/90 text-bg rounded transition-colors"
+                  className="px-4 py-1.5 text-xs font-bold bg-white hover:bg-white/90 text-[#111111] rounded transition-colors"
                 >
                   Create Practice
                 </button>
@@ -527,12 +527,12 @@ const PracticeCard: React.FC<PracticeCardProps> = ({ practice, index }) => {
                     onChange={(e) => setAddTextInput(e.target.value)}
                     placeholder="Enter text, mantra, instruction..."
                     rows={3}
-                    className="w-full bg-raised border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent resize-none placeholder:text-muted/50"
+                    className="w-full bg-raised border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted resize-none placeholder:text-muted/50"
                   />
                   <button
                     onClick={handleAddText}
                     disabled={!addTextInput.trim()}
-                    className="px-3 py-1.5 text-xs font-bold bg-accent hover:bg-accent/90 text-bg rounded transition-colors disabled:opacity-40"
+                    className="px-3 py-1.5 text-xs font-bold bg-white hover:bg-white/90 text-[#111111] rounded transition-colors disabled:opacity-40"
                   >
                     Add Text
                   </button>
@@ -548,7 +548,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({ practice, index }) => {
                   />
                   <button
                     onClick={() => addFileRef.current?.click()}
-                    className="w-full flex flex-col items-center gap-2 py-4 border-2 border-dashed border-line rounded hover:border-accent/50 hover:bg-accent/5 transition-colors"
+                    className="w-full flex flex-col items-center gap-2 py-4 border-2 border-dashed border-line rounded hover:border-faint/50 hover:bg-accent/5 transition-colors"
                   >
                     <Upload className="w-5 h-5 text-muted" />
                     <span className="text-xs text-muted">Upload {addMediaType} file</span>
@@ -598,7 +598,7 @@ const PracticeCard: React.FC<PracticeCardProps> = ({ practice, index }) => {
               <button
                 onClick={() => increment(practice.id, 1)}
                 disabled={done}
-                className="px-6 py-2.5 bg-accent hover:bg-accent/90 text-bg text-sm font-bold rounded transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 bg-white hover:bg-white/90 text-[#111111] text-sm font-bold rounded transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 +1 Count
               </button>
@@ -667,7 +667,7 @@ export const PracticeScreen: React.FC = () => {
 
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-1.5 bg-accent hover:bg-accent/90 text-bg font-semibold text-xs py-2 px-3 rounded transition-colors"
+          className="flex items-center gap-1.5 bg-white hover:bg-white/90 text-[#111111] font-semibold text-xs py-2 px-3 rounded transition-colors"
         >
           <Plus className="w-4 h-4" /> New Practice
         </button>
@@ -685,7 +685,7 @@ export const PracticeScreen: React.FC = () => {
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-1.5 bg-accent hover:bg-accent/90 text-bg font-semibold text-xs py-2 px-3 rounded transition-colors"
+            className="flex items-center gap-1.5 bg-white hover:bg-white/90 text-[#111111] font-semibold text-xs py-2 px-3 rounded transition-colors"
           >
             <Plus className="w-4 h-4" /> Create Practice
           </button>

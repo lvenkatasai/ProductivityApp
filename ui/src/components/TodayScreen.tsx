@@ -1,200 +1,161 @@
 import React from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { 
-  CheckCircle2, 
-  Circle, 
-  Target, 
-  Flame, 
-  Calendar, 
-  HelpCircle, 
-  Sparkles, 
-  SunMedium, 
-  Moon, 
-  RotateCcw,
-  ArrowRight
-} from 'lucide-react';
-import { Tier, EntryStatus, QuestEntry } from '../types';
+import { CheckCircle2, Circle, Moon, SunMedium } from 'lucide-react';
+import { QuestEntry } from '../types';
 
 export const TodayScreen: React.FC = () => {
-  const { 
-    entries, 
-    stats, 
-    scoreResult, 
-    setShowWhyDrawer, 
-    beginDay, 
-    closeDay, 
-    toggleDone, 
-    updateProgress 
+  const {
+    entries,
+    stats,
+    scoreResult,
+    setShowWhyDrawer,
+    beginDay,
+    closeDay,
+    toggleDone,
+    updateProgress
   } = useAppStore();
 
   const mainQuests = entries.filter(e => e.source_type === 'main_quest' || e.tier === 'core');
   const dailyQuests = entries.filter(e => e.source_type !== 'main_quest' && e.tier !== 'core');
   const remainingCount = entries.filter(e => e.status === 'pending' || e.status === 'partial').length;
+  const doneCount = entries.length - remainingCount;
 
   return (
-    <div className="flex-1 overflow-y-auto px-8 py-8 space-y-8">
-      {/* Top Header: Greeting, Rank, Streaks */}
-      <div className="flex items-center justify-between border-b border-line pb-6">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-medium text-muted">
-            <span className="w-2 h-2 rounded-full bg-done" />
-            <span>Productivity OS • System Active</span>
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-text mt-1">
-            Good Morning, Architect
-          </h1>
-          <p className="text-sm text-muted">
-            {stats.day_begun ? `Day begun at ${stats.began_at} • Focus on today's execution` : 'Review your carry-overs and begin day'}
-          </p>
-        </div>
+    <div className="flex-1 overflow-y-auto px-7 py-7">
+      <div className="max-w-[1100px] mx-auto">
+        {/* Greeting */}
+        <h1 className="text-2xl font-normal tracking-[-0.01em] text-text">
+          Good Morning, Architect
+        </h1>
+        <p className="text-sm text-faint mt-0.5">
+          {stats.day_begun ? `Day begun at ${stats.began_at} · Level ${stats.level} ${stats.rank}` : 'Review your carry-overs and begin day'}
+        </p>
 
-        <div className="flex items-center gap-6">
-          <div className="text-right">
-            <div className="text-xs text-muted">Discipline Streak</div>
-            <div className="text-sm font-stat font-bold text-warn flex items-center gap-1 justify-end">
-              <Flame className="w-4 h-4 text-warn fill-warn/20" />
-              <span>{stats.current_streak} Days</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Hero Focal Banner: Remaining Quests & Score Metric */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Score Card with tap-to-explain */}
-        <div 
-          onClick={() => setShowWhyDrawer(true)}
-          className="bg-surface border border-line hover:border-accent/50 transition rounded p-5 cursor-pointer group flex flex-col justify-between"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted">Today's Score</span>
-            <span className="text-xs text-accent flex items-center gap-1 opacity-80 group-hover:opacity-100">
-              Why? <HelpCircle className="w-3.5 h-3.5" />
+        {/* Count tiles */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 mt-7">
+          <button
+            onClick={() => setShowWhyDrawer(true)}
+            className="bg-surface rounded p-4 h-[128px] flex flex-col justify-between text-left cursor-pointer hover:bg-raised transition-colors"
+          >
+            <span className="text-xs text-faint">Daily score</span>
+            <span className={`text-2xl font-normal font-stat ${scoreResult.is_empty ? 'text-muted' : 'text-accent'}`}>
+              {scoreResult.is_empty ? '—' : `${scoreResult.final_score}%`}
             </span>
+            <span className="text-xs text-faint truncate">
+              {scoreResult.is_empty
+                ? 'No quests today'
+                : `${scoreResult.earned_weight.toFixed(1)} / ${scoreResult.due_weight} pts${scoreResult.bonus_points > 0 ? ` + ${scoreResult.bonus_points} bonus` : ''}`}
+            </span>
+          </button>
+          <div className="bg-surface rounded p-4 h-[128px] flex flex-col justify-between">
+            <span className="text-xs text-faint">Quests</span>
+            <span className="text-2xl font-normal font-stat text-text">
+              {remainingCount === 0 ? 'All done' : `${remainingCount} left`}
+            </span>
+            <span className="text-xs text-faint">{doneCount} of {entries.length} done</span>
           </div>
-          <div className="my-3 flex items-baseline gap-2">
-            {scoreResult.is_empty ? (
-              <span className="text-xl font-medium text-muted">No quests today</span>
-            ) : (
-              <>
-                <span className="text-4xl font-bold font-stat text-text group-hover:text-accent transition-colors">
-                  {scoreResult.final_score}%
-                </span>
-                <span className="text-xs text-muted">
-                  ({scoreResult.earned_weight.toFixed(1)} / {scoreResult.due_weight} pts
-                  {scoreResult.bonus_points > 0 && ` +${scoreResult.bonus_points} bonus`})
-                </span>
-              </>
-            )}
+          <div className="bg-surface rounded p-4 h-[128px] flex flex-col justify-between">
+            <span className="text-xs text-faint">Discipline streak</span>
+            <span className="text-2xl font-normal font-stat text-text">{stats.current_streak} d</span>
+            <span className="text-xs text-faint">Level {stats.level} · {stats.rank}</span>
           </div>
-          <div className="w-full bg-raised rounded-full h-1.5 overflow-hidden">
-            <div 
-              className="bg-accent h-full transition-[width] duration-300"
-              style={{ width: `${Math.min(scoreResult.final_score, 100)}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Action Center / Remaining */}
-        <div className="bg-surface border border-line rounded p-5 flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted">Focus Status</span>
-            <Target className="w-4 h-4 text-muted" />
-          </div>
-          <div className="my-2">
-            <div className="text-2xl font-bold font-stat text-text">
-              {remainingCount} {remainingCount === 1 ? 'quest' : 'quests'} remaining
-            </div>
-            <div className="text-xs text-muted mt-1">
-              Core & Standard quests define your daily discipline.
-            </div>
-          </div>
-          <div>
-            {!stats.day_begun ? (
-              <button 
-                onClick={beginDay}
-                className="w-full bg-accent hover:bg-accent/90 text-bg font-semibold text-xs py-2 px-3 rounded transition-colors flex items-center justify-center gap-2"
-              >
-                <SunMedium className="w-4 h-4" /> Begin Day
-              </button>
-            ) : (
-              <button 
-                onClick={closeDay}
-                className="w-full bg-raised hover:bg-line text-text border border-line font-medium text-xs py-2 px-3 rounded transition-colors flex items-center justify-center gap-2"
-              >
-                <Moon className="w-4 h-4" /> Close Day
-              </button>
-            )}
+          <div className="bg-surface rounded p-4 h-[128px] flex flex-col justify-between">
+            <span className="text-xs text-faint">This week</span>
+            <span className="text-2xl font-normal font-stat text-text">88.4%</span>
+            <span className="text-xs text-faint">This month 81.0%</span>
           </div>
         </div>
 
-        {/* Aggregate Horizons */}
-        <div className="bg-surface border border-line rounded p-5 flex flex-col justify-between">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted">Horizons</span>
-            <Calendar className="w-4 h-4 text-muted" />
-          </div>
-          <div className="space-y-2.5 my-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted">This Week</span>
-              <span className="font-stat font-semibold text-done">88.4%</span>
+        {/* Main quests (9) + Close the day (3) */}
+        <div className="grid grid-cols-12 gap-3.5 mt-3.5 items-start">
+          <section className="col-span-12 md:col-span-9 bg-surface rounded p-5">
+            <div className="flex items-baseline justify-between mb-3">
+              <h3 className="text-sm font-semibold text-text">Main quests</h3>
+              <span className="text-xs text-faint">{mainQuests.filter(q => q.status === 'done').length} of {mainQuests.length} done · weight 3x</span>
             </div>
-            <div className="w-full bg-raised rounded-full h-1 overflow-hidden">
-              <div className="bg-done h-full w-[88.4%]" />
+            <div className="space-y-2">
+              {mainQuests.map((quest) => (
+                <QuestRow
+                  key={quest.id}
+                  quest={quest}
+                  onToggle={() => toggleDone(quest.id)}
+                  onProgress={(p) => updateProgress(quest.id, p)}
+                />
+              ))}
             </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-muted">This Month</span>
-              <span className="font-stat font-semibold text-done">81.0%</span>
-            </div>
-            <div className="w-full bg-raised rounded-full h-1 overflow-hidden">
-              <div className="bg-done h-full w-[81%]" />
-            </div>
-          </div>
-          <div className="text-[11px] text-muted text-right">History kept automatically</div>
-        </div>
-      </div>
+          </section>
 
-      {/* Main Quests Section */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-text flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent" />
-            Main Quests (High Impact)
-          </h2>
-          <span className="text-xs text-muted font-stat">Weight 3x</span>
-        </div>
-
-        <div className="space-y-2">
-          {mainQuests.map((quest) => (
-            <QuestRow 
-              key={quest.id} 
-              quest={quest} 
-              onToggle={() => toggleDone(quest.id)}
-              onProgress={(p) => updateProgress(quest.id, p)}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Daily & Habit Quests Section */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-text flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-muted" />
-            Standard & Bonus Quests
-          </h2>
-          <span className="text-xs text-muted font-stat">Standard 2x • Bonus +2.5</span>
+          <section className="col-span-12 md:col-span-3 bg-surface rounded p-5 flex flex-col">
+            <span className="text-xs text-faint">Focus status</span>
+            <span className="text-2xl font-normal font-stat text-text mt-2.5">
+              {remainingCount === 0 ? 'Clear' : `${remainingCount} quest${remainingCount === 1 ? '' : 's'}`}
+            </span>
+            <span className="text-xs text-faint mt-1.5">Core &amp; standard quests define your daily discipline.</span>
+            <div className="mt-auto pt-4">
+              <div className="flex justify-between items-baseline text-xs pb-2 border-t border-line">
+                <span className="text-faint">XP total</span>
+                <span className="font-stat text-text">{stats.overall_xp.toLocaleString()}</span>
+              </div>
+              {!stats.day_begun ? (
+                <button
+                  onClick={beginDay}
+                  className="w-full bg-white hover:bg-white/90 text-[#111111] font-semibold text-[13px] py-2 rounded-full transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <SunMedium className="w-4 h-4" /> Begin Day
+                </button>
+              ) : (
+                <button
+                  onClick={closeDay}
+                  className="w-full bg-white hover:bg-white/90 text-[#111111] font-semibold text-[13px] py-2 rounded-full transition-colors flex items-center justify-center gap-1.5"
+                >
+                  <Moon className="w-4 h-4" /> Close Day
+                </button>
+              )}
+              {!stats.day_begun && (
+                <p className="text-[11px] text-faint text-center mt-2">begins pending quests</p>
+              )}
+            </div>
+          </section>
         </div>
 
-        <div className="space-y-2">
-          {dailyQuests.map((quest) => (
-            <QuestRow 
-              key={quest.id} 
-              quest={quest} 
-              onToggle={() => toggleDone(quest.id)}
-              onProgress={(p) => updateProgress(quest.id, p)}
-            />
-          ))}
+        {/* Standard & bonus (6) + Horizons (6) */}
+        <div className="grid grid-cols-12 gap-3.5 mt-3.5 items-start">
+          <section className="col-span-12 md:col-span-6 bg-surface rounded p-5">
+            <div className="flex items-baseline justify-between mb-3">
+              <h3 className="text-sm font-semibold text-text">Standard &amp; bonus</h3>
+              <span className="text-xs text-faint">standard 2x · bonus +2.5</span>
+            </div>
+            <div className="space-y-2">
+              {dailyQuests.map((quest) => (
+                <QuestRow
+                  key={quest.id}
+                  quest={quest}
+                  onToggle={() => toggleDone(quest.id)}
+                  onProgress={(p) => updateProgress(quest.id, p)}
+                />
+              ))}
+            </div>
+          </section>
+
+          <section className="col-span-12 md:col-span-6 bg-surface rounded p-5">
+            <div className="flex items-baseline justify-between mb-1">
+              <h3 className="text-sm font-semibold text-text">Horizons</h3>
+              <span className="text-xs text-faint">history kept automatically</span>
+            </div>
+            <div className="flex justify-between items-baseline text-sm pt-3">
+              <span className="text-muted">This week</span>
+              <span className="font-stat text-text">88.4%</span>
+            </div>
+            <div className="flex justify-between items-baseline text-sm pt-2.5">
+              <span className="text-muted">This month</span>
+              <span className="font-stat text-text">81.0%</span>
+            </div>
+            <div className="flex justify-between items-baseline text-sm pt-2.5 border-t border-line mt-2.5">
+              <span className="text-muted">Bonus earned today</span>
+              <span className="font-stat text-accent">+{scoreResult.bonus_points}</span>
+            </div>
+            <p className="text-xs text-faint mt-4">Scores are append-only — past days stay as they were recorded.</p>
+          </section>
         </div>
       </div>
     </div>
@@ -214,69 +175,65 @@ const QuestRow: React.FC<QuestRowProps> = ({ quest, onToggle, onProgress }) => {
   const isMissed = quest.status === 'missed';
 
   return (
-    <div className={`flex items-center justify-between p-3.5 rounded bg-surface border transition ${
-      isDone ? 'border-line/40 opacity-75' : isMissed ? 'border-missed/30' : 'border-line hover:border-line/80'
-    }`}>
-      <div className="flex items-center gap-3.5 flex-1 min-w-0">
-        <button 
+    <div className="flex items-center justify-between gap-4 min-h-[63px] px-4 py-3 bg-raised rounded-[14px]">
+      <div className="flex items-center gap-3.5 min-w-0 flex-1">
+        <button
           onClick={onToggle}
-          className="text-muted hover:text-accent transition-colors flex-shrink-0"
+          className={`transition-colors flex-shrink-0 ${isDone ? 'text-accent' : 'text-faint hover:text-text'}`}
+          aria-label={isDone ? 'Mark as pending' : 'Mark as done'}
         >
           {isDone ? (
-            <CheckCircle2 className="w-5 h-5 text-done" />
+            <CheckCircle2 className="w-5 h-5 text-accent" />
           ) : isPartial ? (
-            <div className="w-5 h-5 rounded-full border-2 border-warn flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-warn" />
+            <div className="w-5 h-5 rounded-full border-2 border-accent flex items-center justify-center">
+              <div className="w-2 h-2 rounded-full bg-accent" />
             </div>
           ) : (
-            <Circle className="w-5 h-5 text-line hover:border-accent" />
+            <Circle className={`w-5 h-5 ${isMissed ? 'text-missed' : 'text-faint'}`} />
           )}
         </button>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span className={`text-sm font-medium truncate ${isDone ? 'line-through text-muted' : 'text-text'}`}>
+          <div className="flex items-center gap-2.5">
+            <span className={`text-[13px] truncate ${isDone ? 'line-through text-muted' : 'text-text'}`}>
               {quest.name}
             </span>
-            <span className={`text-[11px] capitalize font-semibold px-1.5 py-0.5 rounded ${
-              quest.tier === 'core' 
-                ? 'bg-accent/10 text-accent border border-accent/20' 
-                : quest.tier === 'standard' 
-                ? 'bg-raised text-muted border border-line' 
-                : 'bg-warn/10 text-warn border border-warn/20'
-            }`}>
-              {quest.tier}
-            </span>
+            <span className="text-[11px] text-faint flex-shrink-0">{quest.tier}</span>
           </div>
 
-          {quest.target > 1 && (
-            <div className="flex items-center gap-2 mt-1.5">
-              <div className="w-32 bg-raised rounded-full h-1 overflow-hidden">
-                <div 
-                  className={`h-full ${isDone ? 'bg-done' : 'bg-warn'}`}
+          {(quest.target > 1 && !isDone) && (
+            <div className="flex items-center gap-2.5 mt-1.5">
+              <div className="w-28 h-1.5 bg-nested rounded-full overflow-hidden flex-shrink-0">
+                <div
+                  className="h-full bg-accent transition-[width] duration-300"
                   style={{ width: `${Math.min((quest.progress / quest.target) * 100, 100)}%` }}
                 />
               </div>
               <span className="text-xs font-stat text-muted">
                 {quest.progress} / {quest.target}
               </span>
-              {!isDone && (
-                <button
-                  onClick={() => onProgress(quest.progress + 1)}
-                  className="text-[11px] font-stat px-1.5 py-0.5 bg-raised hover:bg-line text-text rounded border border-line"
-                >
-                  +1
-                </button>
-              )}
+              <button
+                onClick={() => onProgress(quest.progress + 1)}
+                className="text-[11px] font-stat px-1.5 py-0.5 bg-nested hover:bg-line text-text rounded-full"
+              >
+                +1
+              </button>
+            </div>
+          )}
+          {quest.target > 1 && isDone && (
+            <div className="flex items-center gap-2.5 mt-1.5">
+              <span className="text-xs font-stat text-muted">{quest.progress} / {quest.target}</span>
             </div>
           )}
         </div>
       </div>
 
-      <div className="flex items-center gap-2 text-xs text-muted flex-shrink-0">
-        {isSkipped && <span className="text-muted italic">Skipped ({quest.reason || 'excused'})</span>}
-        {isMissed && <span className="text-missed font-medium">Missed (0 pts)</span>}
-        <span className="text-[11px] font-stat text-muted/60">{quest.source_type}</span>
+      <div className="flex items-center gap-2.5 text-xs flex-shrink-0 font-stat">
+        {isSkipped && <span className="text-faint">Skipped ({quest.reason || 'excused'})</span>}
+        {isMissed && <span className="text-missed">Missed · 0 pts</span>}
+        {isDone && (
+          <span className="text-muted">{quest.tier === 'core' ? '3 pts' : quest.tier === 'standard' ? '2 pts' : 'done'}</span>
+        )}
       </div>
     </div>
   );

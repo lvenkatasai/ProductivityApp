@@ -88,7 +88,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
                 placeholder="e.g. Master Distributed Systems"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
               />
             </div>
 
@@ -99,7 +99,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
                 <select
                   value={area}
                   onChange={(e) => setArea(e.target.value as any)}
-                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
                 >
                   <option value="Career">Career</option>
                   <option value="Learning">Learning</option>
@@ -115,7 +115,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
                 <select
                   value={period}
                   onChange={(e) => setPeriod(e.target.value as any)}
-                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
                 >
                   <option value="daily">Daily</option>
                   <option value="weekly">Weekly</option>
@@ -134,7 +134,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
               <select
                 value={method}
                 onChange={(e) => setMethod(e.target.value as any)}
-                className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
               >
                 <option value="numeric">Numeric Metric (Target Count)</option>
                 <option value="milestones">Sequential Milestones</option>
@@ -152,7 +152,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
                     required
                     value={target}
                     onChange={(e) => setTarget(e.target.value)}
-                    className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                    className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -163,7 +163,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
                     placeholder="e.g. pages, hours, km"
                     value={unit}
                     onChange={(e) => setUnit(e.target.value)}
-                    className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                    className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
                   />
                 </div>
               </div>
@@ -178,7 +178,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
                   rows={3}
                   value={milestonesText}
                   onChange={(e) => setMilestonesText(e.target.value)}
-                  className="w-full bg-bg border border-line rounded p-2.5 text-xs text-text focus:outline-none focus:border-accent"
+                  className="w-full bg-bg border border-line rounded p-2.5 text-xs text-text focus:outline-none focus:border-muted"
                 />
               </div>
             )}
@@ -190,7 +190,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
                 type="date"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
-                className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
               />
             </div>
           </div>
@@ -205,7 +205,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({ isOpen, onClose }) =
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-accent hover:bg-accent/90 text-bg text-xs font-bold rounded transition-colors flex items-center gap-1.5"
+              className="px-4 py-2 bg-white hover:bg-white/90 text-[#111111] text-xs font-bold rounded transition-colors flex items-center gap-1.5"
             >
               <Plus className="w-4 h-4" /> Save Goal
             </button>

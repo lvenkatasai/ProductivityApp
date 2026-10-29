@@ -26,7 +26,7 @@ export const HabitsScreen: React.FC = () => {
 
         <button 
           onClick={() => setShowAddHabitModal(true)}
-          className="bg-accent hover:bg-accent/90 text-bg font-semibold text-xs py-2 px-3 rounded transition-colors flex items-center gap-1.5"
+          className="bg-white hover:bg-white/90 text-[#111111] font-semibold text-xs py-2 px-3 rounded transition-colors flex items-center gap-1.5"
         >
           <Plus className="w-4 h-4" /> New Habit
         </button>

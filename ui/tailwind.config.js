@@ -8,26 +8,29 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Design tokens strictly per PRD §9
-        bg: '#0B0D12',
-        surface: '#11141B',
-        raised: '#171B24',
-        line: '#232833',
-        text: '#E6E9EF',
-        muted: '#8A93A6',
-        accent: '#4C9AFF',
-        done: '#3FB68B',
-        missed: '#D9666B',
-        warn: '#D9A441',
+        // True-black flat direction: ground, one lightness step to cards, one more to rows.
+        bg: '#0C0D0F',
+        surface: '#101113',
+        raised: '#16171A',
+        nested: '#2A2A2A',
+        line: '#1E1F22',
+        text: '#FFFFFF',
+        muted: '#B4B4B4',
+        faint: '#949494',
+        // Lime is the single data hue; it is also the positive colour. It never touches buttons, tabs or nav.
+        accent: '#C6F24E',
+        done: '#C6F24E',
+        missed: '#E5566F',
+        warn: '#E5A93B',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
-        DEFAULT: '3px',
-        sm: '2px',
-        md: '4px',
+        DEFAULT: '20px',
+        sm: '10px',
+        md: '14px',
       }
     },
   },

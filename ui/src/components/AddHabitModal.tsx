@@ -78,7 +78,7 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({ isOpen, onClose })
                 placeholder="e.g. Read 20 pages systems programming"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
               />
             </div>
 
@@ -89,7 +89,7 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({ isOpen, onClose })
                 <select
                   value={area}
                   onChange={(e) => setArea(e.target.value as any)}
-                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
                 >
                   <option value="Career">Career</option>
                   <option value="Learning">Learning</option>
@@ -105,7 +105,7 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({ isOpen, onClose })
                 <select
                   value={tier}
                   onChange={(e) => setTier(e.target.value as any)}
-                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
                 >
                   <option value="core">Core (3x Weight)</option>
                   <option value="standard">Standard (2x Weight)</option>
@@ -120,7 +120,7 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({ isOpen, onClose })
               <select
                 value={scheduleType}
                 onChange={(e) => setScheduleType(e.target.value as any)}
-                className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
               >
                 <option value="daily">Daily (Every single day)</option>
                 <option value="weekdays">Weekdays Only (Mon-Fri)</option>
@@ -137,7 +137,7 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({ isOpen, onClose })
                   max="7"
                   value={timesPerWeek}
                   onChange={(e) => setTimesPerWeek(e.target.value)}
-                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
                 />
               </div>
             )}
@@ -151,7 +151,7 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({ isOpen, onClose })
                   required
                   value={target}
                   onChange={(e) => setTarget(e.target.value)}
-                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
                 />
               </div>
               <div className="space-y-1.5">
@@ -162,7 +162,7 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({ isOpen, onClose })
                   placeholder="e.g. pages, reps, mins"
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
-                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-accent"
+                  className="w-full bg-bg border border-line rounded px-3 py-2 text-xs text-text focus:outline-none focus:border-muted"
                 />
               </div>
             </div>
@@ -178,7 +178,7 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({ isOpen, onClose })
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-accent hover:bg-accent/90 text-bg text-xs font-bold rounded transition-colors flex items-center gap-1.5"
+              className="px-4 py-2 bg-white hover:bg-white/90 text-[#111111] text-xs font-bold rounded transition-colors flex items-center gap-1.5"
             >
               <Plus className="w-4 h-4" /> Save Habit
             </button>

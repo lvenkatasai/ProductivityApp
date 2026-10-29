@@ -4,9 +4,10 @@
 
 @layer base {
   body {
-    background-color: #0B0D12;
-    color: #E6E9EF;
+    background-color: #0C0D0F;
+    color: #FFFFFF;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-variant-numeric: tabular-nums;
   }
 }
 
@@ -16,7 +17,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Custom hairline borders */
+/* Hairline borders */
 .border-line {
-  border-color: #232833;
+  border-color: #1E1F22;
 }
