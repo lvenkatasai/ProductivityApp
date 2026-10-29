@@ -1,0 +1,41 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Productivity OS",
+  "version": "0.1.0",
+  "identifier": "com.productivityos.app",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../../ui/dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Productivity OS",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 640,
+        "center": true,
+        "theme": "Dark",
+        "visible": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; style-src-attr 'unsafe-inline'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi"],
+    "icon": ["icons/16x16.png", "icons/32x32.png", "icons/48x48.png", "icons/128x128.png", "icons/256x256.png", "icons/icon.ico"],
+    "windows": {
+      "nsis": {
+        "installMode": "passive",
+        "languages": ["English"]
+      }
+    }
+  }
+}

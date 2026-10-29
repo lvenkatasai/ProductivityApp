@@ -22,3 +22,8 @@ src-tauri/target/
 
 # Antigravity agent scratchfiles (keep skills)
 .agents/skills/
+
+# Session artifacts
+Conversation.txt
+vite-dev.log
+.taste-skill/

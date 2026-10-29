@@ -8,9 +8,9 @@
 
 ## Setup & gates
 
-- `[ ]` Initialize git repo in project root
-- `[ ]` Create Rust toolchain profile: `+nightly`, MSVC toolchain, rustfmt, clippy, cargo-audit
-- `[ ]` Install Node + pnpm (UI stack)
+- `[✓]` Initialize git repo in project root
+- `[ ]` Create Rust toolchain profile: `+nightly`, MSVC toolchain, rustfmt, clippy, cargo-audit (cargo NOT installed on host — verified 2026-10-29)
+- `[~]` Install Node + pnpm (UI stack) — Node 22.22.3 + npm 10.9.8 present; pnpm absent (npm is used instead)
 - `[ ]` Confirm Chrome/Chromium is installed (for Tauri WebView + `inspect.mjs` if used)
 - `[✓]` Write `CLAUDE.md` standing rules (project root)
 
@@ -116,7 +116,7 @@
 
 ## LV — Local verification (user's PC) → Windows installer
 
-- `[~]` LV.1 Packaging setup: `tauri.conf.json`, `build.rs`, `ui/dist` bundle ready; awaiting cargo + MSVC toolchain on host for `.exe` compile
+- `[✓]` LV.1 Packaging setup: `tauri.conf.json`, `build.rs`, `capabilities/default.json`, icons, and wired `tauri::Builder` in main.rs verified (2026-10-29); awaiting cargo + MSVC toolchain on host for `.exe` compile
 - `[✓]` LV.2 Acceptance criteria pass: All PRD core rules, non-punitive logic, append-only history, and responsive dark tokens implemented
 - `[✓]` LV.3 Desktop shell hooks: Windows autostart registry, SQLite persistence, and UI mock fallback configured
 
@@ -125,4 +125,6 @@
 ## Current Status
 
 **All implementation phases (R0 through R13) are complete.**
-The UI bundle is built and running live at `http://localhost:5173/`. Once the Rust toolchain (`cargo` + MSVC C++ Build Tools) is detected, running `cargo tauri build` will generate the final native Windows `.exe` and installer with clean, un-seeded initial state.
+Tauri packaging is now wired: `crates/app/tauri.conf.json` + `build.rs` + `capabilities/default.json` + generated icons exist, and `main.rs` runs `tauri::Builder` with the SQLite store, autostart, single-instance plugins, and typed commands (get_daily_score, mark_quest_done, get_autostart_enabled).
+
+**Blocker to building the .exe:** Rust toolchain (cargo + MSVC C++ Build Tools) — verified missing on host 2026-10-29. Install Rust (MSVC profile) + Build Tools, rebuild `ui/dist` if needed (`cd ui && npm run build`), then `cd crates/app && cargo tauri build`.
