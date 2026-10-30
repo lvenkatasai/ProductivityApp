@@ -2,7 +2,7 @@
 
 A gamified, local-first Windows desktop productivity app built with **Rust + Tauri 2** and a **React + TypeScript + Vite + Tailwind CSS + Zustand** UI. Single user, launches with your PC, answers two questions every day: *"What do I need to do today?"* and *"Am I progressing toward the life I want?"*
 
-Dark, game-inspired system: quests, XP, levels, ranks, streaks — with honest, explainable numbers. The full spec lives in [`PRD.txt`](PRD.txt); the phase-by-phase build tracker lives in [`progress.md`](progress.md).
+Dark, game-inspired system: quests, XP, levels, ranks, streaks — with honest, explainable numbers.
 
 ## Architecture
 
@@ -56,7 +56,3 @@ The native binaries land in the workspace `target/release/` folder (installer un
 ## Data
 
 App state (quests, goals, habits, practices, workout plan, focus sessions, score history) persists locally in the WebView localStorage under `prod-os-*` keys. The Rust core also ships a SQLite storage layer (`productivity-os.db`, schema-versioned migrations, online backups) available for wiring through the IPC boundary. No accounts, no cloud.
-
----
-
-PRD v1.0 references: business rules in §7 (day close, tiers, scoring, XP), features §8, UX spec §9, data safety §10.
