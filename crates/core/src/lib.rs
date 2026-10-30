@@ -3,9 +3,11 @@
 //! Pure Rust: no I/O, no clock, no database, no Tauri.
 //! Time and IDs are injected through traits (`Clock`, `IdGen`).
 
+pub mod domain;
 pub mod lifecycle;
 pub mod recurrence;
 pub mod score;
+pub mod stats;
 pub mod tier;
 
 pub use lifecycle::{EntryLifecycle, LifecycleError};
@@ -128,15 +130,20 @@ impl Record {
 }
 
 // ---------------------------------------------------------------------------
-// dayKey / boundary helpers (PRD §7.1).
+// dayKey / boundary helpers (PRD Â§7.1).
 // ---------------------------------------------------------------------------
 
 /// dayKey(date, rolloverHour): subtract rollover hours, return the local date.
 ///
 /// Work at 01:30 on a day with rollover 04:00 belongs to the previous day.
 pub fn day_key(local_date: chrono::NaiveDate, rollover_hour: u32) -> chrono::NaiveDate {
-    let sub = chrono::Duration::hours(rollover_hour as i64);
-    local_date - sub
+    let midnight = local_date
+        .and_hms_opt(0, 0, 0)
+        .unwrap_or_default();
+    let shifted = midnight - chrono::Duration::hours(rollover_hour as i64);
+    shifted.date()
+
+
 }
 
 /// boundary(dayKey, rolloverHour): the local instant rolloverHour:00:00.000 on that date.
@@ -150,7 +157,7 @@ pub fn boundary(
     chrono::DateTime::from_naive_utc_and_offset(
         day_key
             .and_time(chrono::NaiveTime::from_hms_opt(rollover_hour, 0, 0).unwrap())
-            .and_utc(),
+            - offset,
         offset,
     )
 }

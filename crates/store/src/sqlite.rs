@@ -6,14 +6,14 @@
 //! - PRAGMA user_version migrations (001: records table, 002: dayKey index)
 //! - Online backup API snapshotting (PRD §10)
 
-use crate::{StoreError, Storage};
+use crate::{Storage, StoreError};
 use prod_os_core::Record;
 use rusqlite::{params, Connection};
-use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
 
 pub struct SqliteStore {
     conn: Arc<Mutex<Connection>>,
+    #[allow(dead_code)]
     db_path: String,
 }
 
@@ -97,7 +97,8 @@ impl SqliteStore {
 
 #[async_trait::async_trait]
 impl Storage for SqliteStore {
-    async fn insert<T: Serialize>(&self, table: &str, record: Record) -> Result<uuid::Uuid, StoreError> {
+    async fn insert_json(&self, table: &str, record: serde_json::Value) -> Result<uuid::Uuid, StoreError> {
+        let record: Record = serde_json::from_value(record).map_err(|_| StoreError::SerializationError)?;
         let conn = self.conn.lock().unwrap();
         let id_str = record.id.to_string();
         let created_at_str = record.created_at.to_rfc3339();
@@ -119,7 +120,7 @@ impl Storage for SqliteStore {
         Ok(record.id)
     }
 
-    async fn get<T: for<'de> Deserialize<'de>>(&self, table: &str, id: uuid::Uuid) -> Result<T, StoreError> {
+    async fn get_json(&self, table: &str, id: uuid::Uuid) -> Result<serde_json::Value, StoreError> {
         let conn = self.conn.lock().unwrap();
         let id_str = id.to_string();
 
@@ -134,7 +135,7 @@ impl Storage for SqliteStore {
         serde_json::from_str(&data_str).map_err(|_| StoreError::SerializationError)
     }
 
-    async fn list<T: for<'de> Deserialize<'de>>(&self, table: &str) -> Result<Vec<T>, StoreError> {
+    async fn list_json(&self, table: &str) -> Result<Vec<serde_json::Value>, StoreError> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn
             .prepare("SELECT data FROM records WHERE table_name = ?1 AND deleted_at IS NULL ORDER BY created_at ASC;")
@@ -153,12 +154,7 @@ impl Storage for SqliteStore {
         Ok(results)
     }
 
-    async fn update<T: Serialize>(
-        &self,
-        table: &str,
-        id: uuid::Uuid,
-        data: serde_json::Value,
-    ) -> Result<(), StoreError> {
+    async fn update_json(&self, table: &str, id: uuid::Uuid, data: serde_json::Value) -> Result<(), StoreError> {
         let conn = self.conn.lock().unwrap();
         let id_str = id.to_string();
         let now_str = chrono::Utc::now().to_rfc3339();

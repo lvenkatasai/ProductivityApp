@@ -42,7 +42,7 @@ export const AddHabitModal: React.FC<AddHabitModalProps> = ({ isOpen, onClose })
       active: true,
       streak: 0,
       best_streak: 0,
-      consistency_pct: 100,
+      consistency_pct: 0,
     };
 
     addHabit(newHabit);

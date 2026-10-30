@@ -34,14 +34,26 @@ export const HabitsScreen: React.FC = () => {
 
       {/* Habit List */}
       <div className="space-y-3">
-        {habits.map((habit) => (
-          <HabitRow 
-            key={habit.id} 
-            habit={habit} 
-            onToggleActive={() => toggleActive(habit.id)}
-            onRemove={() => removeHabit(habit.id)}
-          />
-        ))}
+        {habits.length === 0 ? (
+          <div className="bg-surface border border-line rounded p-10 text-center space-y-3">
+            <p className="text-sm text-muted">No habits yet. Start with one you can keep daily.</p>
+            <button
+              onClick={() => setShowAddHabitModal(true)}
+              className="bg-white hover:bg-white/90 text-[#111111] font-semibold text-xs py-2 px-3 rounded transition-colors inline-flex items-center gap-1.5"
+            >
+              <Plus className="w-4 h-4" /> Create your first habit
+            </button>
+          </div>
+        ) : (
+          habits.map((habit) => (
+            <HabitRow
+              key={habit.id}
+              habit={habit}
+              onToggleActive={() => toggleActive(habit.id)}
+              onRemove={() => removeHabit(habit.id)}
+            />
+          ))
+        )}
       </div>
 
       {/* Add Habit Modal */}

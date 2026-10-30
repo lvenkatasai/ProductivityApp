@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export type DayOfWeek = 0 | 1 | 2 | 3 | 4 | 5 | 6; // 0=Sun, 1=Mon ... 6=Sat
 
@@ -60,141 +61,22 @@ interface WorkoutState {
   toggleSetDone: (exerciseIdx: number, setIdx: number) => void;
 }
 
-const DEFAULT_WEEK_PLAN: DayPlan[] = [
-  {
-    day: 0,
-    isRest: true,
-    sessionName: 'Rest Day',
-    exercises: [],
-  },
-  {
-    day: 1,
-    isRest: false,
-    sessionName: 'Push – Chest & Shoulders',
-    exercises: [
-      {
-        id: 'e-mon-1',
-        name: 'Barbell Bench Press',
-        sets: [
-          { set_number: 1, reps: 5, weight_kg: 80 },
-          { set_number: 2, reps: 5, weight_kg: 80 },
-          { set_number: 3, reps: 5, weight_kg: 80 },
-        ],
-      },
-      {
-        id: 'e-mon-2',
-        name: 'Standing Overhead Press',
-        sets: [
-          { set_number: 1, reps: 5, weight_kg: 50 },
-          { set_number: 2, reps: 5, weight_kg: 50 },
-          { set_number: 3, reps: 5, weight_kg: 50 },
-        ],
-      },
-      {
-        id: 'e-mon-3',
-        name: 'Incline Dumbbell Press',
-        sets: [
-          { set_number: 1, reps: 10, weight_kg: 30 },
-          { set_number: 2, reps: 10, weight_kg: 30 },
-        ],
-      },
-    ],
-  },
-  {
-    day: 2,
-    isRest: false,
-    sessionName: 'Pull – Back & Biceps',
-    exercises: [
-      {
-        id: 'e-tue-1',
-        name: 'Weighted Pull-ups',
-        sets: [
-          { set_number: 1, reps: 8, weight_kg: 10 },
-          { set_number: 2, reps: 8, weight_kg: 10 },
-          { set_number: 3, reps: 8, weight_kg: 10 },
-        ],
-      },
-      {
-        id: 'e-tue-2',
-        name: 'Barbell Row',
-        sets: [
-          { set_number: 1, reps: 5, weight_kg: 70 },
-          { set_number: 2, reps: 5, weight_kg: 70 },
-          { set_number: 3, reps: 5, weight_kg: 70 },
-        ],
-      },
-    ],
-  },
-  {
-    day: 3,
-    isRest: true,
-    sessionName: 'Rest / Active Recovery',
-    exercises: [],
-  },
-  {
-    day: 4,
-    isRest: false,
-    sessionName: 'Legs – Squat Focus',
-    exercises: [
-      {
-        id: 'e-thu-1',
-        name: 'Back Squat',
-        sets: [
-          { set_number: 1, reps: 5, weight_kg: 100 },
-          { set_number: 2, reps: 5, weight_kg: 100 },
-          { set_number: 3, reps: 5, weight_kg: 100 },
-        ],
-      },
-      {
-        id: 'e-thu-2',
-        name: 'Romanian Deadlift',
-        sets: [
-          { set_number: 1, reps: 8, weight_kg: 80 },
-          { set_number: 2, reps: 8, weight_kg: 80 },
-        ],
-      },
-    ],
-  },
-  {
-    day: 5,
-    isRest: false,
-    sessionName: 'Full Body – Deadlift',
-    exercises: [
-      {
-        id: 'e-fri-1',
-        name: 'Deadlift',
-        sets: [
-          { set_number: 1, reps: 5, weight_kg: 120 },
-          { set_number: 2, reps: 5, weight_kg: 120 },
-          { set_number: 3, reps: 3, weight_kg: 130 },
-        ],
-      },
-      {
-        id: 'e-fri-2',
-        name: 'Farmer Carries',
-        sets: [
-          { set_number: 1, reps: 1, weight_kg: 40 },
-          { set_number: 2, reps: 1, weight_kg: 40 },
-        ],
-        note: '30m distance each',
-      },
-    ],
-  },
-  {
-    day: 6,
-    isRest: true,
-    sessionName: 'Rest Day',
-    exercises: [],
-  },
-];
+const DEFAULT_WEEK_PLAN: DayPlan[] = ([0, 1, 2, 3, 4, 5, 6] as DayOfWeek[]).map((day) => ({
+  day,
+  isRest: true,
+  sessionName: 'Rest Day',
+  exercises: [],
+}));
 
 function makeId(): string {
   return `e-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
-export const useWorkoutStore = create<WorkoutState>((set, get) => ({
-  weekPlan: DEFAULT_WEEK_PLAN,
-  todaySession: null,
+export const useWorkoutStore = create<WorkoutState>()(
+  persist(
+    (set, get) => ({
+      weekPlan: DEFAULT_WEEK_PLAN,
+      todaySession: null,
 
   setDayRest: (day, isRest) =>
     set((state) => ({
@@ -312,4 +194,11 @@ export const useWorkoutStore = create<WorkoutState>((set, get) => ({
       });
       return { todaySession: { ...state.todaySession, exercises } };
     }),
-}));
+    }),
+    {
+      name: 'prod-os-workout-v1',
+      version: 1,
+      partialize: (state) => ({ weekPlan: state.weekPlan }),
+    }
+  )
+);

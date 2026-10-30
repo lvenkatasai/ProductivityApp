@@ -15,6 +15,8 @@ pub struct QuestEntry {
     pub reason: Option<crate::tier::SkipReason>,
     pub resolved_at: Option<chrono::DateTime<chrono::Utc>>,
     pub reclassify_until: chrono::DateTime<chrono::Utc>,
+    #[serde(default)]
+    pub area: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -180,6 +182,7 @@ mod tests {
             reason: None,
             resolved_at: None,
             reclassify_until: chrono::Utc::now(),
+            area: String::new(),
         }
     }
 

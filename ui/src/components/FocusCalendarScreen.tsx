@@ -1,80 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Timer, Play, Pause, RotateCcw, Calendar as CalendarIcon,
-  ChevronLeft, ChevronRight, CheckCircle2, Circle, X
-} from 'lucide-react';
+import { Timer, Play, Pause, RotateCcw, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { useFocusStore, type FocusSession } from '../store/useFocusStore';
+import { useAppStore, todayKey } from '../store/useAppStore';
+import type { DayScoreRecord } from '../types';
 
-/* ─── Types ─── */
-interface FocusSession {
-  id: string;
-  linkedTitle: string;
-  category: 'Task' | 'Project' | 'Goal' | 'Area';
-  plannedMinutes: number;
-  actualMinutes: number;
-  date: string; // YYYY-MM-DD
-}
-
-interface DayScore {
-  date: string;
-  score: number;
-  done: number;
-  total: number;
-}
-
-/* ─── Seed focus sessions ─── */
-const SEED_SESSIONS: FocusSession[] = [
-  {
-    id: 'fs-1',
-    linkedTitle: 'Build and ship Productivity OS v1.0',
-    category: 'Goal',
-    plannedMinutes: 50,
-    actualMinutes: 50,
-    date: new Date().toISOString().split('T')[0],
-  },
-  {
-    id: 'fs-2',
-    linkedTitle: 'Core domain score & XP engine',
-    category: 'Task',
-    plannedMinutes: 25,
-    actualMinutes: 25,
-    date: new Date().toISOString().split('T')[0],
-  },
-  {
-    id: 'fs-3',
-    linkedTitle: 'SQLite storage adapter',
-    category: 'Project',
-    plannedMinutes: 30,
-    actualMinutes: 30,
-    date: (() => {
-      const d = new Date();
-      d.setDate(d.getDate() - 1);
-      return d.toISOString().split('T')[0];
-    })(),
-  },
-];
-
-/* ─── Seed daily scores (past ~3 months) ─── */
-function generateScores(): DayScore[] {
-  const scores: DayScore[] = [];
-  const today = new Date();
-  for (let i = 90; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-    const dateStr = d.toISOString().split('T')[0];
-    const seed = d.getDate() * (d.getMonth() + 1);
-    const rand = ((seed * 1103515245 + 12345) & 0x7fffffff) % 100;
-    const score = i === 0 ? 88 : 50 + (rand % 50);
-    const total = 5 + (rand % 3);
-    const done = Math.round((score / 100) * total);
-    scores.push({ date: dateStr, score, done, total });
-  }
-  return scores;
-}
-
-const ALL_SCORES = generateScores();
-
-function getScoreForDate(date: string): DayScore | undefined {
-  return ALL_SCORES.find((s) => s.date === date);
+function getScoreForDate(date: string, scores: DayScoreRecord[]): DayScoreRecord | undefined {
+  return scores.find((s) => s.date === date);
 }
 
 /* ─── Calendar helpers ─── */
@@ -102,9 +33,10 @@ function toISO(d: Date): string {
 const DayDetailPanel: React.FC<{
   date: string;
   sessions: FocusSession[];
+  scores: DayScoreRecord[];
   onClose: () => void;
-}> = ({ date, sessions, onClose }) => {
-  const score = getScoreForDate(date);
+}> = ({ date, sessions, scores, onClose }) => {
+  const score = getScoreForDate(date, scores);
   const daySessions = sessions.filter((s) => s.date === date);
 
   return (
@@ -150,7 +82,7 @@ const DayDetailPanel: React.FC<{
 };
 
 /* ─── Full Calendar ─── */
-const FullCalendar: React.FC<{ sessions: FocusSession[] }> = ({ sessions }) => {
+const FullCalendar: React.FC<{ sessions: FocusSession[]; scores: DayScoreRecord[] }> = ({ sessions, scores }) => {
   const now = new Date();
   const [viewYear, setViewYear] = useState(now.getFullYear());
   const [viewMonth, setViewMonth] = useState(now.getMonth());
@@ -171,7 +103,7 @@ const FullCalendar: React.FC<{ sessions: FocusSession[] }> = ({ sessions }) => {
   const goToday = () => { setViewYear(now.getFullYear()); setViewMonth(now.getMonth()); };
 
   // Score color
-  const scoreColor = (score?: DayScore) => {
+  const scoreColor = (score?: DayScoreRecord) => {
     if (!score) return 'bg-bg border-line/40 text-muted/40';
     if (score.score >= 80) return 'bg-done/15 border-done/30 text-done';
     if (score.score >= 60) return 'bg-accent/10 border-accent/20 text-accent';
@@ -242,7 +174,7 @@ const FullCalendar: React.FC<{ sessions: FocusSession[] }> = ({ sessions }) => {
 
         {days.map((day) => {
           const dateStr = toISO(day);
-          const score = getScoreForDate(dateStr);
+          const score = getScoreForDate(dateStr, scores);
           const isToday = dateStr === todayStr;
           const isFuture = dateStr > todayStr;
           const hasSessions = sessions.some((s) => s.date === dateStr);
@@ -282,6 +214,7 @@ const FullCalendar: React.FC<{ sessions: FocusSession[] }> = ({ sessions }) => {
         <DayDetailPanel
           date={selectedDate}
           sessions={sessions}
+          scores={scores}
           onClose={() => setSelectedDate(null)}
         />
       )}
@@ -293,11 +226,30 @@ const FullCalendar: React.FC<{ sessions: FocusSession[] }> = ({ sessions }) => {
 export const FocusCalendarScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'timer' | 'calendar'>('timer');
 
+  const sessions = useFocusStore((s) => s.sessions);
+  const addSession = useFocusStore((s) => s.addSession);
+  const history = useAppStore((s) => s.history);
+  const entries = useAppStore((s) => s.entries);
+  const scoreResult = useAppStore((s) => s.scoreResult);
+
+  const today = todayKey();
+  const liveToday =
+    !scoreResult.is_empty && !history.some((h) => h.date === today)
+      ? [
+          {
+            date: today,
+            score: scoreResult.final_score,
+            done: entries.filter((e) => e.status === 'done').length,
+            total: entries.length,
+          },
+        ]
+      : [];
+  const scores = [...history, ...liveToday];
+
   // Timer state
   const [secondsLeft, setSecondsLeft] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
-  const [linkedEntity, setLinkedEntity] = useState('Build and ship Productivity OS v1.0 (Goal)');
-  const [sessions, setSessions] = useState<FocusSession[]>(SEED_SESSIONS);
+  const [linkedEntity, setLinkedEntity] = useState('');
   const [timerMode, setTimerMode] = useState<25 | 50>(25);
 
   useEffect(() => {
@@ -307,18 +259,16 @@ export const FocusCalendarScreen: React.FC = () => {
     } else if (secondsLeft === 0 && isRunning) {
       setIsRunning(false);
       // Log a session on completion
-      const newSession: FocusSession = {
-        id: `fs-${Date.now()}`,
-        linkedTitle: linkedEntity.replace(/\s*\(.*\)$/, ''),
+      addSession({
+        linkedTitle: linkedEntity.trim() || 'Unlinked focus session',
         category: 'Task',
         plannedMinutes: timerMode,
         actualMinutes: timerMode,
         date: new Date().toISOString().split('T')[0],
-      };
-      setSessions((prev) => [newSession, ...prev]);
+      });
     }
     return () => { if (interval) clearInterval(interval); };
-  }, [isRunning, secondsLeft]);
+  }, [isRunning, secondsLeft, linkedEntity, timerMode, addSession]);
 
   const toggleTimer = () => setIsRunning((r) => !r);
   const resetTimer = () => { setIsRunning(false); setSecondsLeft(timerMode * 60); };
@@ -482,7 +432,7 @@ export const FocusCalendarScreen: React.FC = () => {
       )}
 
       {/* ─── Calendar view ─── */}
-      {activeTab === 'calendar' && <FullCalendar sessions={sessions} />}
+      {activeTab === 'calendar' && <FullCalendar sessions={sessions} scores={scores} />}
     </div>
   );
 };

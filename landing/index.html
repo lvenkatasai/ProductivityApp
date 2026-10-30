@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Productivity OS — your discipline, on one honest ledger</title>
+<meta name="description" content="A free Windows desktop app that scores your discipline every day: quests, habits, practice and training on one honest, append-only ledger.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f2f2f2;
+    --ink: #0a0a0a;
+    --muted: #6b6b6b;
+    --accent: #d92b21;
+    --accent-ink: #ffffff;
+    --field-1: #000000;
+    --field-1-ink: #ffffff;
+    --margin: 32px;
+
+    --step-small: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+    --step-body: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+    --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
+    --step-head: clamp(2.75rem, 1.2rem + 5vw, 5.5rem);
+    --step-display: clamp(3.5rem, 2rem + 7.5vw, 8.5rem);
+
+    --cond: "Barlow Condensed", "Barlow", sans-serif;
+    --text: "Barlow", sans-serif;
+
+    /* product fragment tokens (true app colours) */
+    --p-ground: #0c0d0f; --p-panel: #101113; --p-row: #16171a; --p-line: #1e1f22;
+    --p-text: #ffffff; --p-muted: #b4b4b4; --p-faint: #949494; --p-accent: #c6f24e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--text); font-size: var(--step-body); line-height: 1.5; overflow-x: clip; }
+  img { display: block; max-width: 100%; height: auto; }
+  a { color: inherit; }
+  .cond { font-family: var(--cond); font-weight: 700; letter-spacing: -0.02em; text-transform: uppercase; }
+
+  /* One button shape, one radius on the whole page */
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--accent); color: var(--accent-ink);
+    border: 0; border-radius: 0; cursor: pointer;
+    font: 500 1rem/1 var(--text); padding: 19px 28px;
+    text-decoration: none;
+    transition: background-color 160ms ease, transform 160ms ease;
+  }
+  .btn:hover { background: #b81f16; }
+  .btn:active { transform: translateY(1px); }
+  .btn-ghost { background: #191919; color: var(--field-1-ink); }
+  .btn-ghost:hover { background: #242424; }
+
+  /* Entrance */
+  .fx { opacity: 0; transform: translateY(24px); transition: opacity 600ms ease, transform 600ms ease; }
+  .fx.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .fx { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
+
+  /* ============ header ============ */
+  header {
+    position: fixed; inset: 0 0 auto 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px var(--margin);
+    background: var(--bg);
+  }
+  header.on-dark {
+    background: var(--field-1);
+    color: #fff;
+  }
+  header.on-dark .wordmark { color: #fff; }
+  header.on-dark .headnav a { color: #fff; }
+  header.on-dark .headnav a:hover { color: var(--accent); }
+  header.on-dark .headnav .btn { color: var(--accent-ink); }
+  .wordmark { font-family: var(--cond); font-weight: 700; letter-spacing: -0.01em; text-transform: uppercase; font-size: 1.15rem; text-decoration: none; display: flex; align-items: center; gap: 9px; }
+  .wordmark .chip { width: 15px; height: 15px; background: var(--accent); flex-shrink: 0; }
+  .headnav { display: flex; align-items: center; gap: 22px; font-size: 0.9375rem; }
+  .headnav a { text-decoration: none; color: var(--ink); }
+  .headnav a:hover { color: var(--accent); }
+  .headnav .btn { padding: 11px 18px; font-size: 0.9375rem; }
+
+  /* ============ hero — sentence split by a frame (pinned reel) ============ */
+  .hero { height: 320svh; background: var(--bg); }
+  .hero-stage {
+    position: sticky; top: 0; height: 100svh; overflow: hidden;
+    padding: 0 var(--margin);
+  }
+  .hero-sentence {
+    position: absolute; left: 0; right: 0; top: 50%;
+    transform: translateY(-50%);
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--cond); font-weight: 700; letter-spacing: -0.02em;
+    font-size: var(--step-display); line-height: 0.9; text-transform: uppercase;
+    pointer-events: none; z-index: 2;
+  }
+  .hero-sentence .hal { padding: 0 var(--margin); background: var(--bg); }
+  .hero-sentence .hal b { color: var(--accent); font-weight: 700; }
+  .reel {
+    position: absolute; left: 50%; top: 0; height: 100svh;
+    width: 35%; min-width: 320px;
+    transform: translateX(-50%);
+    display: flex; flex-direction: column; gap: 24px;
+    will-change: transform;
+  }
+  .frag {
+    position: relative; flex-shrink: 0;
+    aspect-ratio: 16 / 9;
+    border-radius: 4px; overflow: hidden;
+    background: var(--p-ground);
+  }
+  .hero-copy {
+    position: absolute; left: var(--margin); bottom: 32px;
+    max-width: 24ch; font-size: var(--step-body); color: var(--ink);
+  }
+  .hero-copy b { background: var(--accent); color: var(--accent-ink); font-weight: 500; padding: 0 5px; }
+  .hero-badge {
+    position: absolute; right: var(--margin); bottom: 32px;
+    font-size: var(--step-small); color: var(--muted);
+    display: flex; flex-direction: column; gap: 4px; text-align: right;
+  }
+  .hero-tag {
+    position: absolute; left: var(--margin); top: 92px;
+    font-size: var(--step-small); color: var(--muted);
+  }
+
+  /* ============ product fragments (data-ui) in app colours ============ */
+  .frag-inner {
+    width: 100%; height: 100%;
+    background: var(--p-ground);
+    color: var(--p-text);
+    font-family: var(--text); font-size: 10.5px; line-height: 1.35;
+    display: flex; flex-direction: column;
+  }
+  .frag-inner   .fi-bar {
+    height: 26px; border-bottom: 1px solid var(--p-line); /* taste-skill-ignore: app interface rule */
+    display: flex; align-items: center; gap: 6px; padding: 0 12px; flex-shrink: 0;
+  }
+  .fi-bar .fi-name { font-weight: 500; font-size: 9px; color: var(--p-muted); letter-spacing: 0.02em; }
+  .fi-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--p-accent); }
+  .fi-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; height: 100%; }
+  .fi-tile {
+    background: var(--p-panel); border-radius: 12px; padding: 12px;
+  }
+  .fi-tile .lab { color: var(--p-faint); font-size: 8.5px; }
+  .fi-tile .val { font-size: 24px; line-height: 1.1; margin: 5px 0 4px; }
+  .fi-tile .val.lime { color: var(--p-accent); }
+  .fi-tile .cap { color: var(--p-faint); font-size: 8.5px; }
+  .fi-row {
+    background: var(--p-row); border-radius: 8px;
+    padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .fi-row .nm { font-size: 9.5px; color: var(--p-muted); text-decoration: line-through; }
+  .fi-row .nm.open { color: var(--p-text); text-decoration: none; }
+  .fi-row .tier { color: var(--p-faint); font-size: 8px; flex-shrink: 0; }
+  .fi-row .pt { color: var(--p-faint); font-size: 8.5px; flex-shrink: 0; }
+  .fi-check { width: 11px; height: 11px; border-radius: 50%; border: 1.4px solid var(--p-accent); display: inline-flex; align-items: center; justify-content: center; margin-right: 6px; flex-shrink: 0; }
+  .fi-check i { width: 5px; height: 3px; border-left: 1.2px solid var(--p-accent); border-bottom: 1.2px solid var(--p-accent); transform: translateY(-1px) rotate(-45deg); }
+  .fi-check.empty { border-color: #4a4b50; }
+  .fi-check.empty i { display: none; }
+  .fi-tl { display: flex; align-items: center; gap: 6px; }
+  .fi-bar2 { width: 54px; height: 4px; background: #2a2a2a; border-radius: 2px; }
+  .fi-bar2 i { display: block; height: 100%; background: var(--p-accent); border-radius: 2px; }
+  .fi-pill { background: #fff; color: #111; font-weight: 600; border-radius: 999px; padding: 5px 12px; font-size: 8.5px; text-align: center; }
+  .frag-inner .fi-foot { margin-top: auto; color: var(--p-faint); font-size: 8px; padding-top: 8px; }
+
+  /* ============ showcase — headline you can type ============ */
+  .showcase { height: 88svh; padding: 0 var(--margin); background: var(--bg); position: relative; }
+  .showcase .cap { position: absolute; left: var(--margin); top: 48px; font-size: var(--step-small); color: var(--muted); }
+  .typeline { position: relative; max-width: 1400px; }
+  .typeline input {
+    width: 100%;
+    font-family: var(--cond); font-weight: 700; letter-spacing: -0.02em; text-transform: uppercase;
+    font-size: clamp(3rem, 2rem + 6.4vw, 6.75rem); line-height: 1;
+    background: transparent; color: var(--ink); border: 0; outline: none;
+    caret-color: transparent;
+    padding: 0;
+    margin-top: 28svh;
+  }
+  .caretblock {
+    position: absolute; top: 28svh; height: clamp(3rem, 2rem + 6.4vw, 6.75rem);
+    width: 0.08em; font-size: clamp(3rem, 2rem + 6.4vw, 6.75rem);
+    background: var(--accent);
+    animation: blink 1.1s steps(1) infinite;
+    pointer-events: none;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .caretblock { animation: none; } }
+  .typeanswer { margin-top: 48px; width: 100%; max-width: 560px; border-radius: 8px; overflow: hidden; }
+  .typeexamples { position: absolute; left: var(--margin); bottom: 48px; display: flex; gap: 18px; align-items: center; }
+  .typeexamples span { color: var(--muted); font-size: 1.0625rem; }
+  .typeexamples button {
+    background: none; border: 0; border-bottom: 2px solid var(--surface); cursor: pointer;
+    font: 500 1.0625rem var(--text); color: var(--ink); padding: 0 0 2px;
+  }
+  .typeexamples button:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ============ features — rows with margin photographs ============ */
+  .features {
+    min-height: 70svh; padding: 24svh var(--margin) 16svh;
+    background: var(--bg);
+    display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px;
+  }
+  .features > h2 {
+    grid-column: 5 / 10;
+    font-size: var(--step-head); line-height: 0.92; align-self: center;
+    padding: 24svh 0 12svh;
+  }
+  .feataxes { grid-column: 5 / 9; }
+  .featrow {
+    display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px;
+    margin-bottom: clamp(96px, 9vw, 120px);
+  }
+  .featrow:last-child { margin-bottom: 0; }
+  .featcopy { grid-column: 1 / 8; }
+  .featcopy h3 { font-size: clamp(1.75rem, 1.2rem + 3vw, 3rem); line-height: 1; font-weight: 500; letter-spacing: -0.01em; }
+  .featcopy p { margin-top: 14px; max-width: 34ch; color: var(--muted); font-size: 1.0625rem; }
+  .featimg { grid-column: 9 / 13; justify-self: end; align-self: start; }
+  .featimg img { width: 100%; object-fit: cover; }
+  .f-4x5 { width: 260px; aspect-ratio: 4 / 5; }
+  .f-3x2 { width: 340px; aspect-ratio: 3 / 2; }
+  .f-sq  { width: 190px; aspect-ratio: 1 / 1; }
+
+  /* ============ how it works — drag through the stages ============ */
+  .how { display: grid; grid-template-columns: 1fr 1fr; min-height: 88svh; position: relative; }
+  .how-left { background: var(--surface); padding: 12svh var(--margin); }
+  .how-left h2 { font-size: clamp(2.5rem, 1.4rem + 4.6vw, 4.75rem); line-height: 0.92; margin-top: 18svh; }
+  .how-left h2 kbd { color: var(--accent); }
+  .how-right { background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 48px var(--margin); }
+  .how-frag { width: 100%; max-width: 440px; aspect-ratio: 4 / 3.05; border-radius: 4px; overflow: hidden; position: relative; }
+  .how-states { position: relative; width: 100%; height: 100%; }
+  .how-state { position: absolute; inset: 0; opacity: 0; transition: opacity 200ms ease; }
+  .how-state.on { opacity: 1; }
+  .how-slider { position: absolute; left: var(--margin); right: var(--margin); bottom: 28px; }
+  .track { height: 8px; background: #d8d8d8; position: relative; }
+  .track i { position: absolute; inset: 0 auto 0 0; background: var(--ink); }
+  .how-slider input[type="range"] {
+    position: absolute; inset: 0; width: 100%; height: 40px; opacity: 0; margin: 0; cursor: ew-resize;
+  }
+  .thumb { position: absolute; top: -12px; width: 32px; height: 32px; background: var(--accent); pointer-events: none; transition: left 200ms ease; }
+  .stage_names { display: flex; justify-content: space-between; margin-top: 14px; font-size: 1rem; }
+  .stage_names span { color: var(--muted); }
+  .stage_names span.on { color: var(--ink); font-weight: 500; }
+
+  /* ============ pricing — one plan as a sentence ============ */
+  .pricing { background: var(--bg); padding: 24svh var(--margin) 18svh; }
+  .price-sentence {
+    font-size: clamp(3.6rem, 2rem + 7.6vw, 8rem); line-height: 0.95;
+  }
+  .price-sentence .block {
+    display: inline-block; background: var(--accent); color: var(--accent-ink);
+    padding: 0 0.15em; line-height: 1;
+  }
+  .price-foot {
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 32px;
+    margin-top: 64px;
+  }
+  .price-foot p { max-width: 44ch; font-size: 1.25rem; color: var(--ink); }
+  .price-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 14px; }
+  .price-actions .alt { font-size: 1rem; color: var(--muted); text-decoration: underline; text-underline-offset: 4px; }
+  .price-actions .alt:hover { color: var(--ink); }
+
+  /* ============ faq — large questions, answers beside ============ */
+  .faq { padding: 18svh var(--margin) 14svh; background: var(--bg); }
+  .faqrow { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; margin-bottom: clamp(72px, 6vw, 88px); }
+  .faqrow .q { grid-column: 1 / 6; font-size: clamp(1.625rem, 1rem + 2.6vw, 2.5rem); line-height: 1.1; font-weight: 500; letter-spacing: -0.01em; }
+  .faqrow .a { grid-column: 8 / 13; font-size: 1.125rem; line-height: 1.55; color: var(--muted); max-width: 40ch; }
+  .faqrow.faqhead .q { color: var(--muted); }
+  .faqrow .a { align-self: start; }
+
+  /* ============ cta — question at both edges ============ */
+  .cta {
+    height: 100svh; background: var(--field-1); color: var(--field-1-ink);
+    display: flex; flex-direction: column; justify-content: space-between;
+    text-align: center; padding: 32px var(--margin) 24px;
+  }
+  .cta h2 { font-family: var(--cond); font-weight: 700; letter-spacing: -0.02em; text-transform: uppercase; font-size: clamp(6rem, 11vw, 10.5rem); line-height: 1; }
+  .cta .mid { flex: 1; display: flex; align-items: center; justify-content: center; gap: 24px; }
+  .cta .mid .or { color: var(--muted); font-size: 1.125rem; }
+  .cta .after { color: var(--muted); font-size: 1rem; }
+
+  /* ============ footer — invitation over a cropped name ============ */
+  .footer { background: var(--field-1); color: var(--field-1-ink); overflow: hidden; position: relative; padding: 0 var(--margin); }
+  .footer .invite { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; padding-top: 18svh; }
+  .footer .invite .inv-copy h3 { font-family: var(--cond); font-weight: 700; letter-spacing: -0.02em; text-transform: uppercase; font-size: clamp(2.6rem, 5vw, 4.5rem); line-height: 0.95; }
+  .footer .invite .inv-copy .btn { margin-top: 34px; }
+  .footer .invlinks { grid-column: 10 / 13; display: flex; flex-direction: column; gap: 12px; font-size: 1.125rem; align-self: start; }
+  .footer .invlinks a { text-decoration: none; color: var(--field-1-ink); }
+  .footer .invlinks a:hover { color: var(--accent); }
+  .legal {
+    display: flex; justify-content: space-between; gap: 16px;
+    font-size: 0.8125rem; color: var(--muted);
+    max-width: 1200px; margin: 12svh auto 0;
+    position: relative; z-index: 2;
+  }
+  .legal a { color: var(--muted); text-decoration: none; }
+  .legal a:hover { color: #fff; }
+  .bigname {
+    font-family: var(--cond); font-weight: 700; letter-spacing: -0.03em; text-transform: uppercase;
+    font-size: 26vw; line-height: 0.78; white-space: nowrap; color: var(--field-1-ink);
+    transform: translateY(30%);
+    margin-top: -2svh;
+  }
+
+  /* ============ narrow ============ */
+  @media (max-width: 880px) {
+    :root { --margin: 16px; }
+    .headnav a { display: none; }
+    .headnav .btn { display: inline-flex; }
+    .hero-sentence { display: block; top: 15svh; transform: none; }
+    .hero-sentence .hal { fill: none; padding: 0; display: block; }
+    .hero-sentence .hal:last-child { text-align: right; }
+    .reel { position: relative; left: 0; transform: none; width: auto; margin: 40svh 0 0; }
+    .frag { aspect-ratio: 4 / 3; }
+    .hero-copy { position: static; margin-top: 40px; max-width: none; }
+    .hero-badge, .hero-tag { display: none; }
+    .typeline input { margin-top: 22svh; font-size: 11vw; }
+    .caretblock { display: none; }
+    .typeanswer { margin-top: 28px; }
+    .typeexamples { position: static; margin-top: 40px; flex-wrap: wrap; }
+    .features { display: block; padding-top: 8svh; }
+    .features > h2 { padding: 10svh 0 8svh; font-size: 9vw; }
+    .featrow { display: block; margin-bottom: 64px; }
+    .featimg { margin-top: 18px; justify-self: auto; }
+    .featimg img { width: 70% !important; margin-left: auto; }
+    .featrow[data-alt] .featimg img { width: 55% !important; margin-left: 0; }
+    .how { display: block; }
+    .how-right { padding: 32px var(--margin); }
+    .how-frag { max-width: none; }
+    .how-left h2 { margin-top: 8svh; font-size: 9vw; }
+    .price-sentence { font-size: 11vw; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+    .price-sentence .block { align-self: flex-start; }
+    .price-foot { flex-direction: column; align-items: flex-start; }
+    .price-actions { align-items: stretch; width: 100%; }
+    .price-actions .btn { width: 100%; justify-content: center; }
+    .faqrow { display: block; margin-bottom: 56px; }
+    .faqrow .a { margin-top: 12px; max-width: none; }
+    .faqrow + .faqrow { margin-top: 56px; }
+    .cta h2 { font-size: 18vw; }
+    .cta .mid { flex-direction: column; gap: 16px; }
+    .cta .mid .btn { width: 72%; justify-content: center; }
+    .footer .invite { grid-template-columns: 1fr; }
+    .footer .invlinks { flex-direction: row; gap: 20px; margin-top: 40px; }
+    .bigname { font-size: 34vw; }
+    .legal { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header id="hdr">
+  <a class="wordmark" href="#top" aria-label="Productivity OS home">
+    <span class="chip" aria-hidden="true"></span>
+    Productivity OS
+  </a>
+  <nav class="headnav" aria-label="Page">
+    <a href="#about">Showcase</a>
+    <a href="#how">How it works</a>
+    <a href="#faq">Fine print</a>
+    <a class="btn" href="#download">Download</a>
+  </nav>
+</header>
+
+<!-- ================= HERO: sentence split by a frame, reel advances ================= -->
+<section class="hero" id="top" aria-label="What it is">
+  <div class="hero-stage">
+    <p class="hero-tag">Free for Windows · v1.0 · works offline</p>
+
+    <div class="hero-sentence" aria-hidden="false">
+      <span class="hal">It runs</span>
+      <span class="hal">your <b>day.</b></span>
+    </div>
+
+    <div class="reel" id="reel">
+      <!-- frame 1: today's quests (product fragment) -->
+      <figure class="frag" data-ui>
+        <div class="frag-inner">
+          <div class="fi-bar"><span class="fi-dot"></span><span class="fi-name">Productivity OS · Today</span></div>
+          <div class="fi-body">
+            <div class="fi-tile">
+              <div class="lab">Daily score</div>
+              <div class="val lime">91.6%</div>
+              <div class="cap">9.8 / 11.0 pts + 2.5 bonus</div>
+            </div>
+            <div class="fi-row"><span class="fi-tl"><span class="fi-check"><i></i></span><span class="nm">Implement Rust memory &amp; storage adapter</span></span><span class="tier">core</span><span class="pt">3 pts</span></div>
+            <div class="fi-row"><span class="fi-tl"><span class="fi-check empty"></span><span class="nm open">Push routine: 5×5 barbell press</span></span><span style="flex:1"><span class="fi-bar2"><i style="width:60%"></i></span></span><span class="pt">3 / 5</span></div>
+            <div class="fi-row"><span class="fi-tl"><span class="fi-check"><i></i></span><span class="nm">Daily 108-count practice</span></span><span class="tier">core</span><span class="pt">108 / 108</span></div>
+            <div class="fi-foot">Day begun 06:30 · 1 quest</div>
+          </div>
+        </div>
+      </figure>
+
+      <!-- frame 2: the score instrument -->
+      <figure class="frag" data-ui>
+        <div class="frag-inner">
+          <div class="fi-bar"><span class="fi-dot"></span><span class="fi-name">Productivity OS · Score</span></div>
+          <div class="fi-body">
+            <div class="fi-tile">
+              <div class="lab">Seed: Inter tabular figures</div>
+              <div class="val">14 d streak</div>
+              <div class="cap">best 21 d · never reset by a miss</div>
+            </div>
+            <div class="fi-tile">
+              <div class="lab">Why the score moved today</div>
+              <div style="margin-top:8px">
+                <div class="fi-row" style="border-radius:6px; margin-bottom:6px"><span class="fi-tl"><span class="fi-check"><i></i></span><span class="nm">Storage adapter</span></span><span class="pt">3 / 3</span></div>
+                <div class="fi-row" style="border-radius:6px; margin-bottom:6px"><span class="fi-tl"><span class="fi-check empty"></span><span class="nm open">Barbell press</span></span><span class="pt">0.6 / 3</span></div>
+                <div class="fi-row" style="border-radius:6px"><span class="fi-tl"><span class="fi-check"><i></i></span><span class="nm">Read 20 pages</span></span><span class="pt">2 / 2</span></div>
+              </div>
+            </div>
+            <div class="fi-foot">Append-only — past days stay as recorded</div>
+          </div>
+        </div>
+      </figure>
+
+      <!-- frame 3: the week -->
+      <figure class="frag" data-ui>
+        <div class="frag-inner">
+          <div class="fi-bar"><span class="fi-dot"></span><span class="fi-name">Productivity OS · Reports</span></div>
+          <div class="fi-body">
+            <div class="fi-tile">
+              <div class="lab">This week</div>
+              <div class="val">88.4%</div>
+              <div class="cap">6 of 7 days closed</div>
+            </div>
+            <div style="display:flex; gap:8px">
+              <div class="fi-tile" style="flex:1"><div class="lab">Mon</div><div class="fi-bar2" style="width:100%; margin-top:6px"><i style="width:91%"></i></div></div>
+              <div class="fi-tile" style="flex:1"><div class="lab">Tue</div><div class="fi-bar2" style="width:100%; margin-top:6px"><i style="width:83%"></i></div></div>
+              <div class="fi-tile" style="flex:1"><div class="lab">Wed</div><div class="fi-bar2" style="width:100%; margin-top:6px"><i style="width:100%"></i></div></div>
+              <div class="fi-tile" style="flex:1"><div class="lab">Thu</div><div class="fi-bar2" style="width:100%; margin-top:6px"><i style="width:64%"></i></div></div>
+            </div>
+            <div class="fi-foot">8h 40m focused this week</div>
+          </div>
+        </div>
+      </figure>
+    </div>
+
+    <p class="hero-copy"><b>Productivity OS</b> scores your discipline every day: quests, habits, practice and training, on one honest ledger.</p>
+    <p class="hero-badge"><span>Free forever</span><span>Windows 10 / 11</span></p>
+  </div>
+</section>
+
+<!-- ================= SHOWCASE: headline you can type ================= -->
+<section class="showcase" id="about" aria-label="Write a quest">
+  <p class="cap">Write a quest. The app reads it like you do.</p>
+
+  <div class="typeline">
+    <input id="typeinput" type="text" value="Read 20 pages" spellcheck="false" autocomplete="off" aria-label="Type a quest">
+    <span class="caretblock" id="caret" aria-hidden="true"></span>
+
+    <div class="typeanswer" id="typefrag" data-ui>
+      <div class="frag-inner">
+        <div class="fi-bar"><span class="fi-dot"></span><span class="fi-name">New quest ready to schedule</span></div>
+        <div class="fi-body">
+          <div class="fi-row"><span class="fi-tl"><span class="fi-check empty"></span><span class="nm open" id="tq-name" style="font-size:14px">Read 20 pages</span></span><span class="tier" id="tq-tier">standard</span></div>
+          <div class="fi-row" style="border:1px solid var(--p-line)">
+            <span class="tier" style="flex:1; text-align:left">target</span><span class="pt" style="color:var(--p-text)" id="tq-target">20 pages · weight 2x</span>
+          </div>
+          <div class="fi-row" style="border:1px solid var(--p-line)">
+            <span class="tier" style="flex:1; text-align:left">every</span><span class="pt" style="color:var(--p-text)" id="tq-when">weekdays · 06:30 rollover</span>
+          </div>
+          <div class="fi-foot">Numeric quests close when the count is met. No tasks-based scoring.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="typeexamples">
+    <span>Try:</span>
+    <button type="button" data-fill="Read 20 pages">Read 20 pages</button>
+    <button type="button" data-fill="Meditate 10 min">Meditate 10 min</button>
+    <button type="button" data-fill="Barbell press 5 sets">Barbell press 5 sets</button>
+  </div>
+</section>
+
+<!-- ================= FEATURES: rows with margin photographs ================= -->
+<section class="features" id="features" aria-label="What it commits to">
+  <h2 class="cond">Four things, kept honestly.</h2>
+
+  <div class="feataxes">
+    <div class="featrow fx">
+      <div class="featcopy">
+        <h3>Direction that holds.</h3>
+        <p>Goals are long, habits are small, mid-range outcomes are marked met, partial or missed. Tiny tasks do not inflate outcomes.</p>
+      </div>
+      <div class="featimg"><img class="f-4x5" src="assets/sea-girt-lighthouse-october-2020.jpg" width="1920" height="1440" alt="A white lighthouse against a clear sky, holding a fixed direction inshore" loading="lazy" decoding="async"></div>
+    </div>
+
+    <div class="featrow fx" data-alt>
+      <div class="featcopy">
+        <h3>The day starts once.</h3>
+        <p>Begin Day loads your plan; Close Day resolves what is left. Rollover carries open work past 04:00, not past a quota.</p>
+      </div>
+      <div class="featimg"><img class="f-3x2" src="assets/sunrise-point-bryce-canyon-november-2018-002.jpg" width="1920" height="1371" alt="Sunrise breaking over a canyon rim in warm light" loading="lazy" decoding="async"></div>
+    </div>
+
+    <div class="featrow fx">
+      <div class="featcopy">
+        <h3>Practice in your words.</h3>
+        <p>Mantras, audio, images and video attached to one repeatable practice a day. Counts, not vibes.</p>
+      </div>
+      <div class="featimg"><img class="f-sq" src="assets/stacked-stones.jpg" width="1920" height="1442" alt="Stones stacked carefully one upon another" loading="lazy" decoding="async"></div>
+    </div>
+
+    <div class="featrow fx" data-alt>
+      <div class="featcopy">
+        <h3>Earned, not tracked.</h3>
+        <p>A week planner you fill once, live timers in the app, and points that land only when the count does.</p>
+      </div>
+      <div class="featimg"><img class="f-4x5" src="assets/strong-woman-lifting-weights-in-a-gym.jpg" width="1920" height="2877" alt="A determined athlete about to lift a barbell on a training floor" loading="lazy" decoding="async"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOW IT WORKS: drag through the stages ================= -->
+<section class="how" id="how" aria-label="How a day runs">
+  <div class="how-left">
+    <h2 id="how-clause"><kbd>01</kbd> · Begin the day.</h2> <!-- taste-skill-ignore: order word per sheet -->
+  </div>
+  <div class="how-right">
+    <div class="how-frag" data-ui>
+      <div class="how-states">
+        <!-- state 1: begin day -->
+        <div class="how-state on">
+          <div class="frag-inner">
+            <div class="fi-bar"><span class="fi-dot"></span><span class="fi-name">Begin day · wakeup</span></div>
+            <div class="fi-body">
+              <div class="fi-tile"><div class="lab">Plan ready</div><div class="val">5 quests</div><div class="cap">2 core · 2 standard · 1 bonus</div></div>
+              <div class="fi-row"><span class="nm open">Rollover hour</span><span class="pt">04:00</span></div>
+              <div class="fi-row"><span class="nm open">Target wake time</span><span class="pt">06:00</span></div>
+              <div class="fi-pill">Begin Day</div>
+              <div class="fi-foot">No second chance resets. The day starts.</div>
+            </div>
+          </div>
+        </div>
+        <!-- state 2: work -->
+        <div class="how-state">
+          <div class="frag-inner">
+            <div class="fi-bar"><span class="fi-dot"></span><span class="fi-name">Today · in progress</span></div>
+            <div class="fi-body">
+              <div class="fi-row"><span class="fi-tl"><span class="fi-check"><i></i></span><span class="nm">Storage adapter</span></span><span class="pt">3 pts</span></div>
+              <div class="fi-row"><span class="fi-tl"><span class="fi-check empty"></span><span class="nm open">Barbell press 5 sets</span></span><span class="fi-tl"><span class="fi-bar2"><i style="width:20%"></i></span></span><span class="pt">1 / 5</span></div>
+              <div class="fi-row"><span class="fi-tl"><span class="fi-check empty"></span><span class="nm open">108-count practice</span></span><span class="pt">0 / 108</span></div>
+              <div class="fi-tile"><div class="lab">Focus timer</div><div class="val">24:12</div><div class="cap">1 session running</div></div>
+              <div class="fi-foot">Points land only when counts do.</div>
+            </div>
+          </div>
+        </div>
+        <!-- state 3: close day -->
+        <div class="how-state">
+          <div class="frag-inner">
+            <div class="fi-bar"><span class="fi-dot"></span><span class="fi-name">Standard &amp; bonus</span></div>
+            <div class="fi-body">
+              <div class="fi-row"><span class="fi-tl"><span class="fi-check"><i></i></span><span class="nm">Read 20 pages</span></span><span class="pt">2 pts</span></div>
+              <div class="fi-row"><span class="fi-tl"><span class="fi-check empty"></span><span class="nm open">Review PR &amp; audit</span></span><span class="pt" style="color:var(--p-accent)">bonus +2.5</span></div>
+              <div class="fi-row"><span class="fi-tl"><span class="fi-check"><i></i></span><span class="nm">Meditate 10 min</span></span><span class="pt">1 / 1</span></div>
+              <div class="fi-pill">Close Day</div>
+              <div class="fi-foot">Pending closes as missed. The ledger moves on.</div>
+            </div>
+          </div>
+        </div>
+        <!-- state 4: consequence -->
+        <div class="how-state">
+          <div class="frag-inner">
+            <div class="fi-bar"><span class="fi-dot"></span><span class="fi-name">Score · today</span></div>
+            <div class="fi-body">
+              <div class="fi-tile"><div class="lab">Daily score</div><div class="val lime">74.1%</div><div class="cap">8.0 / 11.0 pts + 2.5 bonus</div></div>
+              <div class="fi-tile"><div class="lab">Streak</div><div class="val">14 d</div><div class="cap">best 21 d</div></div>
+              <div class="fi-foot">Tomorrow scores from zero. The streak survives a 74. Misses cost points, not the streak.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="how-slider">
+    <div class="track"><i id="how-fill" style="width: 25%"></i><span class="thumb" id="how-thumb" style="left: calc(25% - 16px)"></span></div>
+    <input type="range" id="how-range" min="1" max="4" step="1" value="1" aria-label="How a day runs, four stages">
+    <div class="stage_names" id="how-names">
+      <span class="on">Begin the day</span><span>Do the work</span><span>Close the day</span><span>Scored for real</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRICING: one plan as a sentence ================= -->
+<section class="pricing" id="download" aria-label="Price">
+  <h2 class="price-sentence cond fx">One download.<br>It costs <span class="block">free.</span></h2>
+
+  <div class="price-foot fx">
+    <p>The complete app for Windows 10 and 11. No account, no subscription, no telemetry. Your data lives in one SQLite file on your own disk. Setup takes about a minute.</p>
+    <div class="price-actions">
+      <a class="btn" href="#download" id="dl-btn" aria-label="Download Productivity OS for Windows">Download for Windows</a>
+      <a class="alt" href="https://github.com/lvenkatasai/ProductivityApp" target="_blank" rel="noopener">Star the project on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ: large questions, answers beside ================= -->
+<section class="faq" id="faq" aria-label="Questions">
+  <div class="faqrow faqhead fx">
+    <h2 class="q">The fine print.</h2>
+    <p class="a"></p>
+  </div>
+
+  <div class="faqrow fx">
+    <h3 class="q">Does it need the internet?</h3>
+    <p class="a">No. Productivity OS is a local desktop app. It installs once and runs fully offline. Nothing about you leaves your machine.</p>
+  </div>
+
+  <div class="faqrow fx">
+    <h3 class="q">Where does my data live?</h3>
+    <p class="a">In one SQLite file on your disk. Copy it, back it up, take it to a new PC. There is no server and no account to hold it hostage.</p>
+  </div>
+
+  <div class="faqrow fx">
+    <h3 class="q">Is a streak broken by one miss?</h3>
+    <p class="a">No. Scores are append-only: a weak day records what happened, and the streak survives it. Only an unstarted day breaks discipline.</p>
+  </div>
+
+  <div class="faqrow fx">
+    <h3 class="q">What are quests made of?</h3>
+    <p class="a">Counts. Pages, kilometres, sets, minutes. Core weight 3x, standard 2x, bonus points above. Numeric quests close when the count is met; a day closes when you say so.</p>
+  </div>
+
+  <div class="faqrow fx">
+    <h3 class="q">Which Windows versions?</h3>
+    <p class="a">Windows 10 (1809 or newer) and Windows 11, 64-bit. A native installer and an exe you can place anywhere; no driver tricks, no admin rights for the download.</p>
+  </div>
+</section>
+
+<!-- ================= CTA: question at both edges ================= -->
+<section class="cta" aria-label="Take it">
+  <h2>Ready to run<br>your day?</h2>
+  <div class="mid">
+    <a class="btn" href="#download">Download for Windows</a>
+    <span class="or">or</span>
+    <a class="btn btn-ghost" href="https://github.com/lvenkatasai/ProductivityApp" target="_blank" rel="noopener">See the source</a>
+  </div>
+  <p class="after">A small installer, no sign-up, and your first score tonight.</p>
+</section>
+
+<!-- ================= FOOTER: invitation over a cropped name ================= -->
+<footer class="footer">
+  <div class="invite">
+    <div class="inv-copy">
+      <h3>Run your day,<br>every day.</h3>
+      <a class="btn" href="#top">Start free</a>
+    </div>
+    <nav class="invlinks" aria-label="Project links">
+      <a href="https://github.com/lvenkatasai/ProductivityApp" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/lvenkatasai/ProductivityApp/releases" target="_blank" rel="noopener">Releases</a>
+      <a href="mailto:hello@example.com">Contact</a>
+    </nav>
+  </div>
+
+  <div class="legal">
+    <span>© 2026 Productivity OS · free, local-first, offline</span>
+    <span>
+      Photographs: <a href="https://commons.wikimedia.org/wiki/File:Sea_Girt_Lighthouse_October_2020.jpg" target="_blank" rel="noopener">lighthouse</a> and <a href="https://commons.wikimedia.org/wiki/File:Sunrise_Point_Bryce_Canyon_November_2018_002.jpg" target="_blank" rel="noopener">sunrise</a> by King of Hearts, <a href="https://commons.wikimedia.org/wiki/File:Stacked_stones.jpg" target="_blank" rel="noopener">stones</a> by Carl MǾnsson, <a href="https://commons.wikimedia.org/wiki/File:Strong_woman_lifting_weights_in_a_gym_focused_on_fitness_and_strength_training.jpg" target="_blank" rel="noopener">athlete</a> by Shixart1985 — CC BY / CC BY-SA, via Wikimedia Commons.
+    </span>
+  </div>
+
+  <div class="bigname" aria-hidden="true">Productivity OS</div>
+</footer>
+
+<script>
+  // Caret block
+  const input = document.getElementById('typeinput');
+  const caret = document.getElementById('caret');
+  const measure = document.createElement('span');
+  measure.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font-family:var(--cond);font-weight:700;letter-spacing:-0.02em;text-transform:uppercase;font-size:clamp(3rem, 2rem + 6.4vw, 6.75rem);';
+  measure.style.fontSize = 'clamp(3rem, 2rem + 6.4vw, 6.75rem)';
+  document.body.appendChild(measure);
+  function placeCaret() {
+    measure.textContent = input.value.slice(0, input.selectionStart == null ? input.value.length : input.selectionStart);
+    caret.style.left = (input.offsetLeft + measure.offsetWidth) + 'px';
+  }
+  input.addEventListener('input', () => {
+    document.getElementById('tq-name').textContent = input.value || 'Untitled quest';
+    placeCaret();
+  });
+  input.addEventListener('keyup', placeCaret);
+  input.addEventListener('focus', placeCaret);
+  input.addEventListener('click', placeCaret);
+  window.addEventListener('resize', placeCaret);
+  placeCaret();
+  document.querySelectorAll('.typeexamples button').forEach(b =>
+    b.addEventListener('click', () => {
+      input.value = b.dataset.fill;
+      input.focus();
+      placeCaret();
+    }));
+
+  // Hero reel: sticky stage, three steps
+  const hero = document.querySelector('.hero');
+  const reel = document.getElementById('reel');
+  function setReel() {
+    const vh = window.innerHeight;
+    const total = hero.offsetHeight - vh;
+    const p = Math.min(1, Math.max(0, (-hero.getBoundingClientRect().top) / total));
+    const frames = reel.children.length;
+    const frameH = reel.children[0].offsetHeight + 24;
+    const centerOffset = (vh - reel.children[0].offsetHeight) / 2;
+    reel.style.transform = `translateX(-50%) translateY(${(-p * (frames - 1) * frameH) + centerOffset}px)`;
+  }
+  setReel();
+  window.addEventListener('scroll', () => requestAnimationFrame(setReel), { passive: true });
+  window.addEventListener('resize', setReel);
+
+  const hdr = document.getElementById('hdr');
+  const cta = document.querySelector('.cta');
+  function setHdr() {
+    const dark = cta.getBoundingClientRect().top < 60;
+    hdr.classList.toggle('on-dark', dark);
+  }
+  setHdr();
+  window.addEventListener('scroll', setHdr, { passive: true });
+
+  // How-it-works slider
+  const range = document.getElementById('how-range');
+  const fill = document.getElementById('how-fill');
+  const thumb = document.getElementById('how-thumb');
+  const states = document.querySelectorAll('.how-state');
+  const names = document.getElementById('how-names');
+  const clauses = ['<kbd>01</kbd> · Begin the day.', '<kbd>02</kbd> · Do the work.', '<kbd>03</kbd> · Close the day.', '<kbd>04</kbd> · Scored for real.']; /* taste-skill-ignore: order words per sheet */
+  function applyHow() {
+    const i = parseInt(range.value, 10);
+    const pct = ((i - 1) / 3) * 100;
+    fill.style.width = pct + '%';
+    thumb.style.left = `calc(${pct}% - 16px)`;
+    states.forEach((s, si) => s.classList.toggle('on', si === i - 1));
+    [...names.children].forEach((n, ni) => n.classList.toggle('on', ni === i - 1));
+    document.getElementById('how-clause').innerHTML = clauses[i - 1];
+  }
+  range.addEventListener('input', applyHow);
+  applyHow();
+
+  // Entrances
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.fx').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

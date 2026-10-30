@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export type MediaType = 'text' | 'image' | 'audio' | 'video';
 
@@ -35,76 +36,61 @@ interface PracticeState {
   removeMedia: (id: string, mediaIdx: number) => void;
 }
 
-const INITIAL_PRACTICES: Practice[] = [
-  {
-    id: 'p-1',
-    name: '108 Concentration Breath Practice',
-    reps: 108,
-    media: [
-      {
-        type: 'text',
-        content:
-          'Breathe in stillness, breathe out clarity. Focus on the breath alone — each count is a single, complete cycle.',
-      },
-    ],
-    count: 0,
-    xp: 30,
-    createdAt: new Date().toISOString(),
-  },
-];
-
 function uid(): string {
   return `p-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
-export const usePracticeStore = create<PracticeState>((set) => ({
-  practices: INITIAL_PRACTICES,
+export const usePracticeStore = create<PracticeState>()(
+  persist(
+    (set) => ({
+      practices: [],
 
-  addPractice: (p) =>
-    set((state) => ({
-      practices: [
-        ...state.practices,
-        { ...p, id: uid(), count: 0, createdAt: new Date().toISOString() },
-      ],
-    })),
+      addPractice: (p) =>
+        set((state) => ({
+          practices: [
+            ...state.practices,
+            { ...p, id: uid(), count: 0, createdAt: new Date().toISOString() },
+          ],
+        })),
 
-  removePractice: (id) =>
-    set((state) => ({ practices: state.practices.filter((p) => p.id !== id) })),
+      removePractice: (id) =>
+        set((state) => ({ practices: state.practices.filter((p) => p.id !== id) })),
 
-  increment: (id, delta) =>
-    set((state) => ({
-      practices: state.practices.map((p) =>
-        p.id === id ? { ...p, count: Math.min(p.count + delta, p.reps) } : p
-      ),
-    })),
+      increment: (id, delta) =>
+        set((state) => ({
+          practices: state.practices.map((p) =>
+            p.id === id ? { ...p, count: Math.min(p.count + delta, p.reps) } : p
+          ),
+        })),
 
-  decrement: (id) =>
-    set((state) => ({
-      practices: state.practices.map((p) =>
-        p.id === id ? { ...p, count: Math.max(0, p.count - 1) } : p
-      ),
-    })),
+      decrement: (id) =>
+        set((state) => ({
+          practices: state.practices.map((p) =>
+            p.id === id ? { ...p, count: Math.max(0, p.count - 1) } : p
+          ),
+        })),
 
-  reset: (id) =>
-    set((state) => ({
-      practices: state.practices.map((p) =>
-        p.id === id ? { ...p, count: 0 } : p
-      ),
-    })),
+      reset: (id) =>
+        set((state) => ({
+          practices: state.practices.map((p) => (p.id === id ? { ...p, count: 0 } : p)),
+        })),
 
-  addMedia: (id, media) =>
-    set((state) => ({
-      practices: state.practices.map((p) =>
-        p.id === id ? { ...p, media: [...p.media, media] } : p
-      ),
-    })),
+      addMedia: (id, media) =>
+        set((state) => ({
+          practices: state.practices.map((p) =>
+            p.id === id ? { ...p, media: [...p.media, media] } : p
+          ),
+        })),
 
-  removeMedia: (id, mediaIdx) =>
-    set((state) => ({
-      practices: state.practices.map((p) =>
-        p.id === id
-          ? { ...p, media: p.media.filter((_, i) => i !== mediaIdx) }
-          : p
-      ),
-    })),
-}));
+      removeMedia: (id, mediaIdx) =>
+        set((state) => ({
+          practices: state.practices.map((p) =>
+            p.id === id
+              ? { ...p, media: p.media.filter((_, i) => i !== mediaIdx) }
+              : p
+          ),
+        })),
+    }),
+    { name: 'prod-os-practices-v1', version: 1 }
+  )
+);

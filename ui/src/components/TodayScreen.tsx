@@ -1,23 +1,52 @@
-import React from 'react';
-import { useAppStore } from '../store/useAppStore';
-import { CheckCircle2, Circle, Moon, SunMedium } from 'lucide-react';
+import React, { useState } from 'react';
+import { useAppStore, todayKey } from '../store/useAppStore';
+import { CheckCircle2, Circle, Moon, SunMedium, Plus, Trash2 } from 'lucide-react';
 import { QuestEntry } from '../types';
+import { AddQuestModal } from './AddQuestModal';
+
+function averageScore(scores: { date: string; score: number }[], since: string): number | null {
+  const inRange = scores.filter((s) => s.date >= since);
+  if (inRange.length === 0) return null;
+  const total = inRange.reduce((sum, s) => sum + s.score, 0);
+  return Math.round((total / inRange.length) * 10) / 10;
+}
 
 export const TodayScreen: React.FC = () => {
   const {
     entries,
+    history,
     stats,
     scoreResult,
     setShowWhyDrawer,
     beginDay,
     closeDay,
     toggleDone,
-    updateProgress
+    updateProgress,
+    removeEntry,
   } = useAppStore();
 
-  const mainQuests = entries.filter(e => e.source_type === 'main_quest' || e.tier === 'core');
-  const dailyQuests = entries.filter(e => e.source_type !== 'main_quest' && e.tier !== 'core');
-  const remainingCount = entries.filter(e => e.status === 'pending' || e.status === 'partial').length;
+  const [showAddQuest, setShowAddQuest] = useState(false);
+
+  const today = todayKey();
+  const liveToday =
+    scoreResult.is_empty || history.some((h) => h.date === today)
+      ? []
+      : [{ date: today, score: scoreResult.final_score }];
+  const allScores = [...history, ...liveToday];
+
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+  startOfWeek.setHours(0, 0, 0, 0);
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const isoDate = (d: Date) => d.toISOString().split('T')[0];
+
+  const weekScore = averageScore(allScores, isoDate(startOfWeek));
+  const monthScore = averageScore(allScores, isoDate(startOfMonth));
+
+  const mainQuests = entries.filter((e) => e.source_type === 'main_quest' || e.tier === 'core');
+  const dailyQuests = entries.filter((e) => e.source_type !== 'main_quest' && e.tier !== 'core');
+  const remainingCount = entries.filter((e) => e.status === 'pending' || e.status === 'partial').length;
   const doneCount = entries.length - remainingCount;
 
   return (
@@ -50,7 +79,7 @@ export const TodayScreen: React.FC = () => {
           <div className="bg-surface rounded p-4 h-[128px] flex flex-col justify-between">
             <span className="text-xs text-faint">Quests</span>
             <span className="text-2xl font-normal font-stat text-text">
-              {remainingCount === 0 ? 'All done' : `${remainingCount} left`}
+              {entries.length === 0 ? '—' : remainingCount === 0 ? 'All done' : `${remainingCount} left`}
             </span>
             <span className="text-xs text-faint">{doneCount} of {entries.length} done</span>
           </div>
@@ -61,8 +90,12 @@ export const TodayScreen: React.FC = () => {
           </div>
           <div className="bg-surface rounded p-4 h-[128px] flex flex-col justify-between">
             <span className="text-xs text-faint">This week</span>
-            <span className="text-2xl font-normal font-stat text-text">88.4%</span>
-            <span className="text-xs text-faint">This month 81.0%</span>
+            <span className="text-2xl font-normal font-stat text-text">
+              {weekScore === null ? '—' : `${weekScore}%`}
+            </span>
+            <span className="text-xs text-faint">
+              This month {monthScore === null ? '—' : `${monthScore}%`}
+            </span>
           </div>
         </div>
 
@@ -71,19 +104,34 @@ export const TodayScreen: React.FC = () => {
           <section className="col-span-12 md:col-span-9 bg-surface rounded p-5">
             <div className="flex items-baseline justify-between mb-3">
               <h3 className="text-sm font-semibold text-text">Main quests</h3>
-              <span className="text-xs text-faint">{mainQuests.filter(q => q.status === 'done').length} of {mainQuests.length} done · weight 3x</span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-faint">{mainQuests.filter(q => q.status === 'done').length} of {mainQuests.length} done · weight 3x</span>
+                <button
+                  onClick={() => setShowAddQuest(true)}
+                  className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-raised hover:bg-line text-text transition-colors flex items-center gap-1"
+                >
+                  <Plus className="w-3 h-3" /> Add quest
+                </button>
+              </div>
             </div>
             <div className="space-y-2">
               {mainQuests.length === 0 ? (
-                <p className="text-xs text-faint text-center py-6">
-                  No main quests yet. Begin your day to load the plan you set.
-                </p>
+                <div className="text-center py-6 space-y-2">
+                  <p className="text-xs text-faint">No main quests yet. Add the work that matters most.</p>
+                  <button
+                    onClick={() => setShowAddQuest(true)}
+                    className="text-[11px] font-semibold px-3 py-1.5 rounded-full bg-white text-[#111111] hover:bg-white/90 transition-colors"
+                  >
+                    Add your first quest
+                  </button>
+                </div>
               ) : mainQuests.map((quest) => (
                 <QuestRow
                   key={quest.id}
                   quest={quest}
                   onToggle={() => toggleDone(quest.id)}
                   onProgress={(p) => updateProgress(quest.id, p)}
+                  onRemove={() => removeEntry(quest.id)}
                 />
               ))}
             </div>
@@ -116,7 +164,7 @@ export const TodayScreen: React.FC = () => {
                 </button>
               )}
               {!stats.day_begun && (
-                <p className="text-[11px] text-faint text-center mt-2">begins pending quests</p>
+                <p className="text-[11px] text-faint text-center mt-2">records today's score to history</p>
               )}
             </div>
           </section>
@@ -140,6 +188,7 @@ export const TodayScreen: React.FC = () => {
                   quest={quest}
                   onToggle={() => toggleDone(quest.id)}
                   onProgress={(p) => updateProgress(quest.id, p)}
+                  onRemove={() => removeEntry(quest.id)}
                 />
               ))}
             </div>
@@ -152,11 +201,11 @@ export const TodayScreen: React.FC = () => {
             </div>
             <div className="flex justify-between items-baseline text-sm pt-3">
               <span className="text-muted">This week</span>
-              <span className="font-stat text-text">88.4%</span>
+              <span className="font-stat text-text">{weekScore === null ? '—' : `${weekScore}%`}</span>
             </div>
             <div className="flex justify-between items-baseline text-sm pt-2.5">
               <span className="text-muted">This month</span>
-              <span className="font-stat text-text">81.0%</span>
+              <span className="font-stat text-text">{monthScore === null ? '—' : `${monthScore}%`}</span>
             </div>
             <div className="flex justify-between items-baseline text-sm pt-2.5 border-t border-line mt-2.5">
               <span className="text-muted">Bonus earned today</span>
@@ -166,6 +215,8 @@ export const TodayScreen: React.FC = () => {
           </section>
         </div>
       </div>
+
+      <AddQuestModal isOpen={showAddQuest} onClose={() => setShowAddQuest(false)} />
     </div>
   );
 };
@@ -174,16 +225,17 @@ interface QuestRowProps {
   quest: QuestEntry;
   onToggle: () => void;
   onProgress: (val: number) => void;
+  onRemove: () => void;
 }
 
-const QuestRow: React.FC<QuestRowProps> = ({ quest, onToggle, onProgress }) => {
+const QuestRow: React.FC<QuestRowProps> = ({ quest, onToggle, onProgress, onRemove }) => {
   const isDone = quest.status === 'done';
   const isPartial = quest.status === 'partial';
   const isSkipped = quest.status === 'skipped';
   const isMissed = quest.status === 'missed';
 
   return (
-    <div className="flex items-center justify-between gap-4 min-h-[63px] px-4 py-3 bg-raised rounded-[14px]">
+    <div className="group flex items-center justify-between gap-4 min-h-[63px] px-4 py-3 bg-raised rounded-[14px]">
       <div className="flex items-center gap-3.5 min-w-0 flex-1">
         <button
           onClick={onToggle}
@@ -242,6 +294,13 @@ const QuestRow: React.FC<QuestRowProps> = ({ quest, onToggle, onProgress }) => {
         {isDone && (
           <span className="text-muted">{quest.tier === 'core' ? '3 pts' : quest.tier === 'standard' ? '2 pts' : 'done'}</span>
         )}
+        <button
+          onClick={onRemove}
+          className="opacity-0 group-hover:opacity-100 text-faint hover:text-missed p-1 rounded transition-all"
+          aria-label="Remove quest"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
       </div>
     </div>
   );

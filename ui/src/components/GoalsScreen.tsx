@@ -34,15 +34,27 @@ export const GoalsScreen: React.FC = () => {
 
       {/* Goal Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {goals.map((goal) => (
-          <GoalCard 
-            key={goal.id} 
-            goal={goal} 
-            onDelta={(d) => updateGoalProgress(goal.id, d)}
-            onToggleMilestone={(mId) => toggleMilestone(goal.id, mId)}
-            onRemove={() => removeGoal(goal.id)}
-          />
-        ))}
+        {goals.length === 0 ? (
+          <div className="col-span-full bg-surface border border-line rounded p-10 text-center space-y-3">
+            <p className="text-sm text-muted">No goals yet. Define one outcome you actually care about.</p>
+            <button
+              onClick={() => setShowAddGoalModal(true)}
+              className="bg-white hover:bg-white/90 text-[#111111] font-semibold text-xs py-2 px-3 rounded transition-colors inline-flex items-center gap-1.5"
+            >
+              <Plus className="w-4 h-4" /> Create your first goal
+            </button>
+          </div>
+        ) : (
+          goals.map((goal) => (
+            <GoalCard
+              key={goal.id}
+              goal={goal}
+              onDelta={(d) => updateGoalProgress(goal.id, d)}
+              onToggleMilestone={(mId) => toggleMilestone(goal.id, mId)}
+              onRemove={() => removeGoal(goal.id)}
+            />
+          ))
+        )}
       </div>
 
       {/* Add Goal Modal */}

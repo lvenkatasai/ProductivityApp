@@ -4,32 +4,9 @@ mod commands;
 #[allow(dead_code)]
 mod os;
 
-use commands::{AppState, CommandResponse};
-use prod_os_core::DailyScoreResult;
+use commands::AppState;
 use prod_os_store::SqliteStore;
 use std::sync::Arc;
-
-#[tauri::command]
-async fn get_daily_score(
-    state: tauri::State<'_, AppState>,
-) -> Result<CommandResponse<DailyScoreResult>, String> {
-    let day = chrono::Utc::now().date_naive();
-    match commands::get_daily_score(state.store.as_ref(), day).await {
-        Ok(result) => Ok(CommandResponse::ok(result)),
-        Err(e) => Ok(CommandResponse::err(e)),
-    }
-}
-
-#[tauri::command]
-async fn mark_quest_done(
-    state: tauri::State<'_, AppState>,
-    entry_id: uuid::Uuid,
-) -> Result<CommandResponse<()>, String> {
-    match commands::mark_quest_done(state.store.as_ref(), entry_id).await {
-        Ok(()) => Ok(CommandResponse::ok(())),
-        Err(e) => Ok(CommandResponse::err(e)),
-    }
-}
 
 #[tauri::command]
 fn get_autostart_enabled() -> bool {
@@ -43,8 +20,17 @@ fn get_autostart_enabled() -> bool {
     }
 }
 
+#[tauri::command]
+fn set_autostart(enabled: bool) -> Result<(), String> {
+    commands::set_autostart(enabled)
+}
+
+#[tauri::command]
+async fn backup_now(state: tauri::State<'_, AppState>, path: String) -> Result<(), String> {
+    commands::backup_now(state.store.as_ref(), path).await
+}
+
 fn main() {
-    // Initialize the SQLite store with embedded migrations
     let store = match SqliteStore::new("productivity-os.db") {
         Ok(s) => Arc::new(s),
         Err(e) => {
@@ -60,14 +46,12 @@ fn main() {
             tauri_plugin_autostart::MacosLauncher::LaunchAgent,
             None,
         ))
-        .plugin(tauri_plugin_single_instance::init(
-            |_app, _args, _cwd| {},
-        ))
+        .plugin(tauri_plugin_single_instance::init(|_app, _args, _cwd| {}))
         .manage(app_state)
         .invoke_handler(tauri::generate_handler![
-            get_daily_score,
-            mark_quest_done,
-            get_autostart_enabled
+            get_autostart_enabled,
+            set_autostart,
+            backup_now
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

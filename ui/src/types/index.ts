@@ -58,3 +58,10 @@ export interface UserStats {
   day_begun: boolean;
   began_at?: string;
 }
+
+export interface DayScoreRecord {
+  date: string;
+  score: number;
+  done: number;
+  total: number;
+}
