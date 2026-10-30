@@ -23,10 +23,14 @@ Screens: Today, Goals, Habits, Spiritual Practice, Fitness, Focus/Calendar, Repo
 
 ## Download (Windows)
 
-Get the latest build from the [Releases page](https://github.com/lvenkatasai/ProductivityApp/releases/latest):
+Direct downloads (click the file, then **Download**):
 
-- **`Productivity-OS-*-x64-setup.exe`** — recommended installer. Installs for the current user (no admin), adds a Start Menu entry and an uninstaller.
-- **`Productivity-OS-*-x64-portable.exe`** — portable. Run it directly, no install.
+| File | What it is |
+| --- | --- |
+| [`Productivity-OS-0.1.0-x64-setup.exe`](./Productivity-OS-0.1.0-x64-setup.exe) | Recommended. Per-user installer (no admin), adds a Start Menu entry and an uninstaller. |
+| [`Productivity-OS-0.1.0-x64-portable.exe`](./Productivity-OS-0.1.0-x64-portable.exe) | Portable. Run it directly, no install. |
+
+The same files are attached to the [v0.1.0 release](https://github.com/lvenkatasai/ProductivityApp/releases/tag/v0.1.0).
 
 Requires Windows 10/11 (x64) with the Microsoft Edge WebView2 Runtime (preinstalled on most systems). The build is unsigned, so SmartScreen may show *"Windows protected your PC"* — click **More info → Run anyway**. All data stays local; no accounts, telemetry, or network calls.
 
