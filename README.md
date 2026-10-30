@@ -21,6 +21,15 @@ ui/                      — React frontend served by Tauri's WebView.
 
 Screens: Today, Goals, Habits, Spiritual Practice, Fitness, Focus/Calendar, Reports (+ Begin Day flow).
 
+## Download (Windows)
+
+Get the latest build from the [Releases page](https://github.com/lvenkatasai/ProductivityApp/releases/latest):
+
+- **`Productivity-OS-*-x64-setup.exe`** — recommended installer. Installs for the current user (no admin), adds a Start Menu entry and an uninstaller.
+- **`Productivity-OS-*-x64-portable.exe`** — portable. Run it directly, no install.
+
+Requires Windows 10/11 (x64) with the Microsoft Edge WebView2 Runtime (preinstalled on most systems). The build is unsigned, so SmartScreen may show *"Windows protected your PC"* — click **More info → Run anyway**. All data stays local; no accounts, telemetry, or network calls.
+
 ## Prerequisites
 
 - **Rust** (MSVC toolchain on Windows) — https://rust-lang.org/tools/install
@@ -39,14 +48,14 @@ cd ..
 # 2. Develop (hot reload) or produce the Windows .exe / installer
 cd crates/app
 cargo tauri dev          # development window
-cargo tauri build        # bundles NSIS (.exe installer) and MSI
+cargo tauri build --bundles nsis   # NSIS .exe installer
 ```
 
-The native binaries land in `crates/app/target/release/bundle/`.
+The native binaries land in the workspace `target/release/` folder (installer under `target/release/bundle/nsis/`).
 
 ## Data
 
-All records live in a local SQLite database (`productivity-os.db`) created on first launch — no accounts, no cloud. Soft deletes, append-only history, schema-versioned migrations with backup-before-migration.
+App state (quests, goals, habits, practices, workout plan, focus sessions, score history) persists locally in the WebView localStorage under `prod-os-*` keys. The Rust core also ships a SQLite storage layer (`productivity-os.db`, schema-versioned migrations, online backups) available for wiring through the IPC boundary. No accounts, no cloud.
 
 ---
 
